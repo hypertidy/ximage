@@ -2,13 +2,63 @@
 % Please edit documentation in R/ximage.R
 \name{ximage}
 \alias{ximage}
-\title{Plot an image (no matter what)}
+\title{A new image()
+Plot an image (no matter what)}
 \usage{
-ximage(x, extent = NULL, ...)
+ximage(
+  x,
+  extent = NULL,
+  zlim = NULL,
+  add = FALSE,
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  col = hcl.colors(12, "YlOrRd", rev = TRUE)
+)
 }
 \arguments{
-\item{...}{}
+\item{x}{matrix, array, or native raster}
+
+\item{extent}{optional, numeric xmin,xmax,ymin,ymax}
+
+\item{zlim}{optional, range of data to set colour map (to maintain absolute colours across multiple plots)}
+
+\item{add}{add to plot, or start afresh}
+
+\item{...}{passed to plot when \code{add = FALSE}}
+
+\item{xlab}{x axis label, empty by default}
+
+\item{ylab}{y axis lable, empty by default}
+
+\item{col}{optional colours to map matrix/array data to}
+}
+\value{
+a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
 }
 \description{
 ximage combines the best of image() and rasterImage().
+}
+\details{
+\code{\link[=ximage]{ximage()}} is designed like graphics function with the following limitations removed,
+\code{image()} 1:4, \code{rasterImage()} 5:7.
+
+\enumerate{
+\item Allow arrays with RGB/A.
+\item Allow matrix with character (named colours, or hex) or raw (Byte) values
+\item Plot in 0,ncol 0,nrow by default
+\item Override default with extent (xmin, xmax, ymin, ymax)
+
+\item Allow general numeric values.
+\item Start a plot from scratch without setting up a plot to paint to.
+\item Plot by default in 0,ncol,0,nrow if unspecified.
+}
+
+ximage uses the GIS raster default used by rasterImage. WIP: There is a similar function 'image0?'
+that provides the same features but assumes that orientation is like image...
+
+Colours by 'col' are only mapped for numeric data, this may change (to remap RGB or raw imagery via greyscale conversion)
+}
+\examples{
+ximage(volcano)
 }
