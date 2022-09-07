@@ -95,6 +95,11 @@ ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL,
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(12, "YlOrRd", rev = TRUE)) {
   stopifnot(inherits(x, "array"))
+
+   if (is.raw(x)) {
+      ## convert
+      x <- array(as.integer(x), dim(x))
+    }
   ## rescale to
   ## assume RGB if dim(x)[3] is 3, or 4
   ## allow 0,1 or arbitrary numeric
@@ -116,9 +121,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 
     x <- .make_hex_matrix(x, cols = col )
   } else {
-    if (is.raw(x)) {
-      ## convert
-    }
+
     ## else character
     x <- matrix(x, dim(x)[1L])
   }
@@ -145,4 +148,33 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
 
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
+}
+
+
+
+#' A new contour
+#'
+#' To work with [ximage()]
+#'
+#' @param x something we can contour
+#' @inheritParams ximage
+#' @inheritDotParams ximage
+#' @return nothing, called for its side effect of creating or adding to a plot
+#' @export
+#'
+#' @examples
+#' ex <-  c(2667394, 2668004, 6478902, 6479772)
+#' v <- volcano[nrow(volcano):1, ncol(volcano):1]
+#' ximage(v, extent = ex, asp = 1)
+#' #im <- whatarelief::imagery(extent = ex, projection = "+proj=nzmg +datum=WGS84")
+#' #ximage(im, add = TRUE, extent = ex)
+#' xcontour(v, add = TRUE, extent = ex, col = "white")
+xcontour <- function(x, extent = NULL, ..., add = FALSE) {
+  x <- t(x[nrow(x):1, ])
+  if (is.null(extent)) extent <- c(0, ncol(x), 0, nrow(x))
+  xre <- diff(extent[1:2])/nrow(x)
+  yre <- diff(extent[3:4])/ncol(x)
+  xx <- seq(extent[1] + xre/2, extent[2] - xre/2, length.out = nrow(x) )
+  yy <- seq(extent[3] + yre/2, extent[4] - yre/2, length.out = ncol(x) )
+  contour(xx, yy, x, add = add, ...)
 }
