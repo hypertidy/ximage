@@ -19,6 +19,9 @@
     <loc>/index.html</loc>
   </url>
   <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
@@ -28,9 +31,15 @@
     <loc>/reference/topo.html</loc>
   </url>
   <url>
+    <loc>/reference/xcontour.html</loc>
+  </url>
+  <url>
     <loc>/reference/ximage-package.html</loc>
   </url>
   <url>
     <loc>/reference/ximage.html</loc>
+  </url>
+  <url>
+    <loc>/reference/xrect.html</loc>
   </url>
 </urlset>
