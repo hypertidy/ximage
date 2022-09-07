@@ -1,6 +1,6 @@
 Package: ximage
-Title: Draw Images of Raster Data 
-Version: 0.0.0.9000
+Title: Draw Images of Raster Data and Related Adornments
+Version: 0.0.0.9001
 Authors@R: 
     person("Michael D.", "Sumner", , "mdsumner@gmail.com", role = c("aut", "cre"))
 Description: Draw images easily and as if doing that was considered desirable or  
@@ -14,7 +14,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Language: es
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Depends: 
     R (>= 2.10)
 LazyData: true

@@ -15,6 +15,9 @@ xrect(x, add = FALSE, ..., asp = 1L)
 
 \item{asp}{aspect ratio, defaults to 1}
 }
+\value{
+nothing, called for side effect of creating or adding to a plot
+}
 \description{
 Draw rectangles from four colummns xmin,xmax,ymin,ymax
 }
@@ -25,4 +28,7 @@ Calls \code{\link[=rect]{rect()}}, but will instantiate a plot if \code{add = FA
 xrect(runif(100))
 xrect(sort(runif(100)))
 xrect(runif(100), col = hcl.colors(25, alpha = seq(.2, .8, length.out = 25)))
+
+example(xcontour, ask = FALSE)
+xrect(ex, add = TRUE, lwd = 5, lty = 2)
 }

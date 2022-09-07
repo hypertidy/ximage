@@ -17,7 +17,7 @@ ximage(
 )
 }
 \arguments{
-\item{x}{matrix, array, or native raster}
+\item{x}{matrix, array, or native raster (nativeRaster, or raster)}
 
 \item{extent}{optional, numeric xmin,xmax,ymin,ymax}
 
@@ -61,4 +61,5 @@ Colours by 'col' are only mapped for numeric data, this may change (to remap RGB
 }
 \examples{
 ximage(volcano)
+ximage(as.raster(matrix(0:1, 49, 56)))
 }

@@ -4,7 +4,7 @@
 \name{ximage-package}
 \alias{ximage-package}
 \alias{_PACKAGE}
-\title{ximage: Draw Images of Raster Data}
+\title{ximage: Draw Images of Raster Data and Related Adornments}
 \description{
 Draw images easily and as if doing that was considered desirable or even essential to be able to do. Set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms 'xmin,xmax,ymin,ymax'. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are (or will be) supported. A little bit like 'image()' and 'rasterImage()' from the 'graphics' package but with the good features celebrated and made easier to use.
 }

@@ -9,13 +9,16 @@
 #' @param ... arguments passed to [rect()]
 #' @param asp aspect ratio, defaults to 1
 #'
-#' @return
+#' @return nothing, called for side effect of creating or adding to a plot
 #' @export
-#'
+#' @importFrom graphics rect
 #' @examples
 #' xrect(runif(100))
 #' xrect(sort(runif(100)))
 #' xrect(runif(100), col = hcl.colors(25, alpha = seq(.2, .8, length.out = 25)))
+#'
+#' example(xcontour, ask = FALSE)
+#' xrect(ex, add = TRUE, lwd = 5, lty = 2)
 xrect <- function(x, add = FALSE, ..., asp = 1L) {
   ## assuming cbind(xmin, xmax, ymin, ymax)
   x <- matrix(unlist(x, use.names = FALSE), ncol = 4L)
@@ -24,6 +27,6 @@ xrect <- function(x, add = FALSE, ..., asp = 1L) {
   if (!add) {
     plot(NA, xlim = xlim, ylim = ylim, asp = asp, xlab = "", ylab = "")
   }
-  rect(x[,1L], x[,3L], x[,2L], x[, 4L], ...)
+  graphics::rect(x[,1L], x[,3L], x[,2L], x[, 4L], ...)
  invisible(NULL)
 }
