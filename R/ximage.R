@@ -87,14 +87,14 @@ flip_c <- function(x) {
 #' @examples
 #' ximage(volcano)
 #' ximage(as.raster(matrix(0:1, 49, 56)))
-ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(12, "YlOrRd", rev = TRUE)) {
+ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
   UseMethod("ximage")
 }
 
 
 
 #' @export
-ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(12, "YlOrRd", rev = TRUE)) {
+ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
   stopifnot(inherits(x, "array"))
 
    if (is.raw(x)) {
@@ -140,7 +140,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 }
 
 #' @export
-ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(12, "YlOrRd", rev = TRUE)) {
+ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
     if (is.null(extent)) {
     extent <- c(0, dim(x)[1L], 0, dim(x)[2L])
     }
@@ -152,7 +152,7 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
 }
 
 #' @export
-ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(12, "YlOrRd", rev = TRUE)) {
+ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
   ximage.nativeRaster(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
 }
 
