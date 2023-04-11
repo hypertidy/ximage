@@ -92,9 +92,51 @@ ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL,
 }
 
 
+#' @export
+ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+  ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
+  attrs <- attributes(x)
+  if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
+  dimension <- NULL
+  if (!is.null(attrs$dimension)) {
+    dimension <- attrs$dimension
+
+  }
+  projection <- NULL
+
+  if (is.null(dimension)) {
+    if (is.null(dim(x[[1]]))) {
+      dimension <- dim(x[[1]])
+    } else {
+    stop("no dimension known")
+    }
+  }
+ if (!is.null(attrs$projection)) projection <- attrs$projection
+  if (is.character(x[[1]])) {
+    if (grepl("^#", na.omit(x[[1]])[1])) {
+      ## we have image data
+    } else {
+      ## can't read data in ximage
+      stop("can't read data in the this package")
+#      x[[1]] <- as.vector(t(elevation(source = x[[1]], extent = attr(x, "extent"), dimension = attr(x, "dimension"), projection = attr(x, "projection"))))
+    }
+  }
+
+  ximage(matrix(x[[1]], dimension[2L], byrow = TRUE),
+                 extent = extent, asp = 1)
+  ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
+
+  ## return the materialized data
+  invisible(x)
+}
 
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+
+  if (is.list(x)) {
+    ximage.list(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+    return(invisible(x))
+  }
   stopifnot(inherits(x, "array"))
 
    if (is.raw(x)) {
@@ -134,6 +176,9 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
   if (is.null(xlab)) xlab <- ""
   if (is.null(ylab)) ylab <- ""
 
+  if (is.list(extent) && length(extent) == 2) {
+    ximage_meshplot(x, extent, add = add)
+  }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
   invisible(list(x = x, extent = extent))
@@ -147,6 +192,9 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   if (is.null(xlab)) xlab <- ""
   if (is.null(ylab)) ylab <- ""
 
+  if (is.list(extent) && length(extent) == 2) {
+    ximage_meshplot(x, extent, add = add)
+  }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
 }
