@@ -169,7 +169,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     x <- matrix(x, dim(x)[1L])
   }
   if (is.null(extent)) {
-    extent <- c(0, dim(x)[1L], 0, dim(x)[2L])
+    extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
   }
   ## if !add
 #  par(xaxs = "i", yaxs = "i")
@@ -187,7 +187,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 #' @export
 ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
     if (is.null(extent)) {
-    extent <- c(0, dim(x)[1L], 0, dim(x)[2L])
+    extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
     }
   if (is.null(xlab)) xlab <- ""
   if (is.null(ylab)) ylab <- ""
