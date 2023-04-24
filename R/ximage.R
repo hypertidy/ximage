@@ -122,8 +122,13 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
     }
   }
 
-  ximage(matrix(x[[1]], dimension[2L], byrow = TRUE),
+  if (length(x) %in% c(3, 4)) {
+    ximage(aperm(array(unlist(x), c(dimension[1:2], 3)), c(2, 1, length(x))),
                  extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+  } else {
+    ximage(matrix(x[[1]], dimension[2L], byrow = TRUE),
+                   extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+  }
   ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
 
   ## return the materialized data
