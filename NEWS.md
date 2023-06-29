@@ -1,5 +1,8 @@
 # ximage dev
 
+* `ximage()` can now plot sf::gdal_read objects. 
+
+
 * Fixed default extent for an array/matrix, it was transposed (!). 
 
 * ximage now dows what imfun in whatarelief did, i.e. with the output of gdal_raster_data, gdal_raster_dsn, gdal_raster_image do the obvious plot. 

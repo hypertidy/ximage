@@ -93,8 +93,16 @@ ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL,
 
 
 #' @export
+#' @importFrom stats na.omit
 ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
-  ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
+
+
+  if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
+    ## smells like sf
+    ximage_sf_data(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+    return(invisible(x))
+  }
+   ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
   attrs <- attributes(x)
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
   dimension <- NULL
@@ -113,7 +121,7 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
   }
  if (!is.null(attrs$projection)) projection <- attrs$projection
   if (is.character(x[[1]])) {
-    if (grepl("^#", na.omit(x[[1]])[1])) {
+    if (grepl("^#", stats::na.omit(x[[1]])[1])) {
       ## we have image data
     } else {
       ## can't read data in ximage
@@ -210,3 +218,62 @@ ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab 
 }
 
 
+
+.gt_dim_to_extent <- function (x, dim)
+{
+    xx <- c(x[1], x[1] + dim[1] * x[2])
+    yy <- c(x[4] + dim[2] * x[6], x[4])
+    c(xx, yy)
+}
+ximage_sf_data <- function(x, extent = NULL, ...) {
+ #
+ #  List of 19
+ # $ filename            : chr "vrt:///vsicurl/https://gebco2022.s3.valeria.science/gebco_2022_complete_cog.tif?ovr=8"
+ # $ driver              : chr [1:2] "VRT" "Virtual Raster"
+ # $ cols                : num [1:2] 1 42
+ # $ rows                : num [1:2] 1 21
+ # $ bands               : int 1
+ # $ crs                 :List of 2
+ #  ..$ input: chr "WGS 84"
+ #  ..$ wkt  : chr "GEOGCRS[\"WGS 84\",\n    ENSEMBLE[\"World Geodetic System 1984 ensemble\",\n        MEMBER[\"World Geodetic Sys"| __truncated__
+ #  ..- attr(*, "class")= chr "crs"
+ # $ geotransform        : num [1:6] -180 8.57 0 90 0 ...
+ # $ datatype            : chr "Int16"
+ # $ sub                 : chr NA
+ # $ meta                : chr "AREA_OR_POINT=Area"
+ # $ band_meta           :List of 1
+ #  ..$ : chr(0)
+ # $ attribute_tables    :List of 1
+ #  ..$ : list()
+ # $ color_tables        :List of 1
+ #  ..$ : NULL
+ # $ ranges              : num [1, 1:4] -32768 0 32767 0
+ # $ blocksizes          : int [1, 1:2] 512 512
+ # $ descriptions        : chr ""
+ # $ default_geotransform: int 0
+ # $ proxy               : logi FALSE
+ # $ colorInterp         : int 1
+ # - attr(*, "data")= num [1:42, 1:21] -3001 -3203 -3158 -2999 -2897 ...
+ #  ..- attr(*, "units")= chr ""
+ #
+ #
+  d <- attr(x, "data")
+  dm <- dim(d)
+  do_extent <- TRUE
+  if (!is.null(extent)) {
+    do_extent <- FALSE
+  }
+  if (is.null(d)) stop("no data in sf read object")
+
+  if (is.null(dm) || length(dm)  < 2) {
+    d <- matrix(d)
+    if (!is.null(extent)) warning("extent ignored for 1D array")
+    extent <- NULL
+  } else if (length(dm) > 2) {
+    d <- matrix(d[1:prod(dim[1:2])], dm[1], dm[2])
+  }
+  if (do_extent) {
+      extent <- .gt_dim_to_extent(x$geotransform, dm[1:2])
+  }
+  ximage(t(d), extent = extent, ...)
+}
