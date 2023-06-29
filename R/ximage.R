@@ -190,7 +190,8 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
   if (is.null(ylab)) ylab <- ""
 
   if (is.list(extent) && length(extent) == 2) {
-    ximage_meshplot(x, extent, add = add)
+    stop("meshplot not yet supported")
+    #ximage_meshplot(x, extent, add = add)
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
@@ -206,7 +207,8 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   if (is.null(ylab)) ylab <- ""
 
   if (is.list(extent) && length(extent) == 2) {
-    ximage_meshplot(x, extent, add = add)
+    stop("meshplot not yet supported")
+    #ximage_meshplot(x, extent, add = add)
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)

@@ -91,3 +91,4 @@ if (plot_points) {
     invisible(NULL)
 
 }
+
