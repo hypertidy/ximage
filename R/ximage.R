@@ -275,7 +275,18 @@ ximage_sf_data <- function(x, extent = NULL, ...) {
     d <- matrix(d[1:prod(dim[1:2])], dm[1], dm[2])
   }
   if (do_extent) {
-      extent <- .gt_dim_to_extent(x$geotransform, dm[1:2])
+
+    ## sf gdal_read (@  4901a41ec56d2ad1524bab553c9195a6bd417987) doesn't update the geotransform ofsets so we do that here
+    gt <- x$geotransform
+    if (x$cols[1] > 1) {
+      gt[1] <- gt[1] + gt[2] * (x$cols[1] - 1)
+    }
+    if (x$rows[1] > 1) {
+      gt[4] <- gt[4] + gt[6] * (x$row[1] - 1)
+    }
+
+
+      extent <- .gt_dim_to_extent(gt, dm[1:2])
   }
   ximage(t(d), extent = extent, ...)
 }
