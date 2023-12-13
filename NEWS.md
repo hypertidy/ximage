@@ -1,7 +1,8 @@
 # ximage dev
 
-* `ximage()` can now plot sf::gdal_read objects. 
+* Added suport for `xcontour()` for the output output of `gdal_raster_data()` in {vapour}. 
 
+* `ximage()` can now plot sf::gdal_read objects. 
 
 * Fixed default extent for an array/matrix, it was transposed (!). 
 

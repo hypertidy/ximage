@@ -28,6 +28,9 @@ nothing, called for its side effect of creating or adding to a plot
 \description{
 To work with \code{\link[=ximage]{ximage()}}
 }
+\details{
+Input may be a matrix or a list from gdal_raster_data() in the vapour package.
+}
 \examples{
 ex <-  c(2667394, 2668004, 6478902, 6479772)
 v <- volcano[nrow(volcano):1, ncol(volcano):1]
