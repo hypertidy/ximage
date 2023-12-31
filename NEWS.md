@@ -1,5 +1,7 @@
 # ximage dev
 
+* `image()` now works with list output from gdalnara (same as gdal_raster_image but with nativeRaster). 
+
 * Added suport for `xcontour()` for the output output of `gdal_raster_data()` in {vapour}. 
 
 * `ximage()` can now plot sf::gdal_read objects. 

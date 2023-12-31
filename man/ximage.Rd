@@ -46,6 +46,7 @@ ximage combines the best of image() and rasterImage().
 \enumerate{
 \item Allow arrays with RGB/A.
 \item Allow matrix with character (named colours, or hex) or raw (Byte) values
+\Allow list output from vapour, a list with numeric values, hex character, or nativeRaster
 \item Plot in 0,ncol 0,nrow by default
 \item Override default with extent (xmin, xmax, ymin, ymax)
 
