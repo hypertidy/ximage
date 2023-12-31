@@ -102,6 +102,7 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
     ximage_sf_data(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
     return(invisible(x))
   }
+
    ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
   attrs <- attributes(x)
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
@@ -128,6 +129,11 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
       stop("can't read data in the this package")
 #      x[[1]] <- as.vector(t(elevation(source = x[[1]], extent = attr(x, "extent"), dimension = attr(x, "dimension"), projection = attr(x, "projection"))))
     }
+  }
+
+    if (inherits(x[[1]], "nativeRaster")) {
+    ximage(x[[1L]], extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+      return(invisible(x))
   }
 
   if (length(x) %in% c(3, 4)) {
