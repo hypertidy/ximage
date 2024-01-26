@@ -25,7 +25,7 @@ flip_c <- function(x) {
   rg <- range(x, na.rm = TRUE)
   (x - rg[1L])/diff(rg)
 }
-.make_hex_matrix <- function(x, cols = NULL) {
+.make_hex_matrix <- function(x, cols = NULL, ..., breaks) {
    alpha <- 1
   if (length(dim(x)) > 2) {
     if (dim(x)[3] == 4L) {
@@ -151,7 +151,7 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
 }
 
 #' @export
-ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
 
   if (is.list(x)) {
     ximage.list(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
@@ -180,9 +180,17 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 
     }
 
-    x <- (x - rg[1L])/diff(rg)
 
-    x <- .make_hex_matrix(x, cols = col )
+    #x <- .make_hex_matrix(x, cols = col )
+
+    if (!is.null(col)) {
+
+      x <- matrix(palr::image_pal(x, col, breaks = breaks), dim(x)[1L], dim(x)[2L])
+    } else {
+      x <- (x - rg[1L])/diff(rg)
+
+    }
+
   } else {
 
     ## else character
