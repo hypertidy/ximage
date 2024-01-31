@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ximage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9008</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9009</span>
       </span>
     </div>
 
@@ -41,6 +41,19 @@
       
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.0" id="ximage-00">ximage 0.0<a class="anchor" aria-label="anchor" href="#ximage-00"></a></h2>
+<ul><li><p><code><a href="../reference/ximage.html">ximage()</a></code> now handles <code>breaks</code> argument to go with <code>col</code> (for numeric input).</p></li>
+<li><p><code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> now works with list output from gdalnara (same as gdal_raster_image but with nativeRaster).</p></li>
+<li><p>Added suport for <code><a href="../reference/xcontour.html">xcontour()</a></code> for the output output of <code>gdal_raster_data()</code> in {vapour}.</p></li>
+<li><p><code><a href="../reference/ximage.html">ximage()</a></code> can now plot sf::gdal_read objects.</p></li>
+<li><p>Fixed default extent for an array/matrix, it was transposed (!).</p></li>
+<li><p>ximage now dows what imfun in whatarelief did, i.e. with the output of gdal_raster_data, gdal_raster_dsn, gdal_raster_image do the obvious plot.</p></li>
+<li><p>Add ‘mesh_plot’ mode to <code><a href="../reference/ximage.html">ximage()</a></code>, not fully implemented.</p></li>
+<li><p>Increase the default colour classes, 12 -&gt; 96.</p></li>
+<li><p>Support ‘raster’ class as per as.raster.</p></li>
+<li><p>Added xcontour and xrect functions.</p></li>
+</ul></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
