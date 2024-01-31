@@ -38,4 +38,5 @@ ximage(v, extent = ex, asp = 1)
 #im <- whatarelief::imagery(extent = ex, projection = "+proj=nzmg +datum=WGS84")
 #ximage(im, add = TRUE, extent = ex)
 xcontour(v, add = TRUE, extent = ex, col = "white")
+xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
 }

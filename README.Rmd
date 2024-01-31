@@ -21,23 +21,17 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/hypertidy/ximage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hypertidy/ximage/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-VERY VERY WIP
 
+The goal of ximage is to make something like 'image()' and 'rasterImage()' but without the missing functionality and useability. 
 
-The goal of ximage is to make something like 'image()' and 'rasterImage()' but without the acquired need for compatibility with WTAF. 
+ximage supports making images from
 
+- numeric, character, byte matrix
+- numeric array
+- nativeRaster
+- list returned from `vapour::gdal_raster_()` functions which include numeric, character, byte vectors or nativeRaster
 
-<!--
-
-## Installation
-
-You can install the development version of ximage from [GitHub](https://github.com/) with:
-
-``` r
-# install.packages("devtools")
-devtools::install_github("hypertidy/ximage")
-```
--->
+The orientation is in "raster-order", i.e. when you're looking at the picture it's topleft to topright, then scan lines down each row to the bottom (like western reading and `par(mfrow)` order). This matches the way that spatial data readers read imagery. 
 
 ## Example
 
@@ -57,9 +51,30 @@ ximage(logo_n, extent = c(10, 20, 20, 40), add = TRUE)
 ximage(topo, extent = c(40, 60, 80, 100), add = TRUE, col = hcl.colors(256))
 ```
 
+We can get imagery from the internet, and plot it very quickly. 
+
+```{r imagery}
+library(vapour)  ## quite a recent version, dev in January 2024
+virtual_earth <-  "<GDAL_WMS><Service name=\"VirtualEarth\"><ServerUrl>http://a${server_num}.ortho.tiles.virtualearth.net/tiles/a${quadkey}.jpeg?g=90</ServerUrl></Service><MaxConnections>4</MaxConnections><Cache/></GDAL_WMS>"
+par(mar = rep(0, 4))
+px <- dev.size("px")
+px[which.min(px)] <- 0
+
+## change lon_0 and lat_0 to anywhere you like
+im <- gdal_raster_nara(virtual_earth, target_ext = c(-1, 1, -1, 1) * 3e5, target_dim = px, target_crs = "+proj=laea +lon_0=147 +lat_0=-42")
+
+system.time(ximage(im, asp = 1))
 
 
+## crank up the size it's still fast
+px <- px * 4
+im <- gdal_raster_nara(virtual_earth, target_ext = c(-1, 1, -1, 1) * 3e5, target_dim = px, target_crs = "+proj=laea +lon_0=147 +lat_0=-42")
 
-  ## Code of Conduct
+system.time(ximage(im, asp = 1))
+
+```
+
+
+## Code of Conduct
   
   Please note that the ximage project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

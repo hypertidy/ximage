@@ -59,7 +59,7 @@ flip_c <- function(x) {
 #' \enumerate{
 #'    \item Allow arrays with RGB/A.
 #'    \item Allow matrix with character (named colours, or hex) or raw (Byte) values
-#'    \Allow list output from vapour, a list with numeric values, hex character, or nativeRaster
+#'    \item Allow list output from vapour, a list with numeric values, hex character, or nativeRaster
 #'    \item Plot in 0,ncol 0,nrow by default
 #'    \item Override default with extent (xmin, xmax, ymin, ymax)
 #'
@@ -182,8 +182,10 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 
 
     #x <- .make_hex_matrix(x, cols = col )
-
-    if (!is.null(col)) {
+    ## politely ignore numeric arrays with 3 or 4 slices
+    dmx <- dim(x)
+    tt <- length(dmx %in% c(3, 4)) && is.numeric(x) && all(x >= 0, na.rm = TRUE)
+    if (!tt && !is.null(col)) {
 
       x <- matrix(palr::image_pal(x, col, breaks = breaks), dim(x)[1L], dim(x)[2L])
     } else {

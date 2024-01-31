@@ -17,6 +17,7 @@
 #' #im <- whatarelief::imagery(extent = ex, projection = "+proj=nzmg +datum=WGS84")
 #' #ximage(im, add = TRUE, extent = ex)
 #' xcontour(v, add = TRUE, extent = ex, col = "white")
+#' xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
 xcontour <- function(x, extent = NULL, ..., add = FALSE) {
   UseMethod("xcontour")
 }
@@ -36,7 +37,7 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
   if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
     ## smells like sf
     stop("no xcontour for sf")
-    ximage_sf_data(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+    ximage_sf_data(x, extent = extent,  add = add, ...)
     return(invisible(x))
   }
    ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix

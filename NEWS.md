@@ -1,4 +1,4 @@
-# ximage dev
+# ximage 0.0
 
 * `ximage()` now handles `breaks` argument to go with `col` (for numeric input). 
 
