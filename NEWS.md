@@ -1,5 +1,7 @@
 # ximage 0.0
 
+* Now support {gdalraster} output of `read_ds(, as_list = TRUE)`. 
+
 * `ximage()` now handles `breaks` argument to go with `col` (for numeric input). 
 
 * `image()` now works with list output from gdalnara (same as gdal_raster_image but with nativeRaster). 

@@ -106,6 +106,13 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
 
    ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
   attrs <- attributes(x)
+  if ("gis" %in% names(attrs)) {
+    ## gdalraster output
+    attrs <- attrs[["gis"]]
+    attrs$dimension <- attrs$dim
+    attrs$projection <- attrs$srs
+    attrs$extent <- attrs$bbox[c(1, 3, 2, 4)]
+  }
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
   dimension <- NULL
   if (!is.null(attrs$dimension)) {
@@ -184,9 +191,14 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     #x <- .make_hex_matrix(x, cols = col )
     ## politely ignore numeric arrays with 3 or 4 slices
     dmx <- dim(x)
-    tt <- length(dmx %in% c(3, 4)) && is.numeric(x) && all(x >= 0, na.rm = TRUE)
-    if (!tt && !is.null(col)) {
+    tt <- length(dmx %in% c(3, 4)) && is.numeric(x) ##&& all(x >= 0, na.rm = TRUE)
 
+    #if (!tt && !is.null(col)) {
+
+    if (!tt) {
+      #browser()
+      if (is.null(col)) col <-  colorRampPalette(grDevices::hcl.colors(12, "YlOrRd",
+                                                                                rev = TRUE))
       x <- matrix(palr::image_pal(x, col, breaks = breaks), dim(x)[1L], dim(x)[2L])
     } else {
       x <- (x - rg[1L])/diff(rg)
@@ -211,6 +223,8 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     #ximage_meshplot(x, extent, add = add)
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
+
+  if (anyNA(x)) x[is.na(x)] <- 1
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
   invisible(list(x = x, extent = extent))
 }
