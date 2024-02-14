@@ -164,6 +164,16 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     ximage.list(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
     return(invisible(x))
   }
+  
+  if (is.numeric(x) && "gis" %in% names(attributes(x))) {
+    ## vector output from gdalraster
+    gis <- attr(x, "gis")
+    x_list <- asplit(array(x, dim = gis$dim), MARGIN=3)
+    attr(x_list, "gis") <- gis
+    ximage.list(x_list, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+    return(invisible(x_list))
+  }
+  
   stopifnot(inherits(x, "array"))
 
    if (is.raw(x)) {
