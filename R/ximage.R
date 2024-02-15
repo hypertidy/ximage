@@ -156,7 +156,14 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
   ## return the materialized data
   invisible(x)
 }
-
+#' @export
+ximage.raw <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
+  if (all(c("width", "height", "depth") %in% names(attributes(x)))) {
+    attrs <- attributes(x)
+    x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
+  }
+  ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+}
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
 
@@ -164,7 +171,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     ximage.list(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
     return(invisible(x))
   }
-  
+
   if (is.numeric(x) && "gis" %in% names(attributes(x))) {
     ## vector output from gdalraster
     gis <- attr(x, "gis")
@@ -173,7 +180,13 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     ximage.list(x_list, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
     return(invisible(x_list))
   }
-  
+
+  ## fastpng raw output
+  # if (is.raw(x) && all(c("width", "height", "depth") %in% names(attributes(x)))) {
+  #   attrs <- attributes(x)
+  #   x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
+  # }
+
   stopifnot(inherits(x, "array"))
 
    if (is.raw(x)) {

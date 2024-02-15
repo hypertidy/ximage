@@ -10,5 +10,10 @@ Draw images easily and as if doing that was considered desirable or even essenti
 \author{
 \strong{Maintainer}: Michael D. Sumner \email{mdsumner@gmail.com}
 
+Other contributors:
+\itemize{
+  \item Chrsi Toney [contributor]
+}
+
 }
 \keyword{internal}

@@ -1,6 +1,8 @@
 # ximage 0.0
 
-* Now support {gdalraster} output of `read_ds(, as_list = TRUE)`. 
+* Now support raw output of fastpng. 
+
+* Now support {gdalraster} output of `read_ds(, as_list = TRUE)` or raw numeric, thanks to Chris Toney. 
 
 * `ximage()` now handles `breaks` argument to go with `col` (for numeric input). 
 

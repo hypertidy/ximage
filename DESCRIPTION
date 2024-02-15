@@ -1,8 +1,9 @@
 Package: ximage
 Title: Draw Images of Raster Data and Related Adornments
-Version: 0.0.0.9010
+Version: 0.0.0.9011
 Authors@R: 
-    person("Michael D.", "Sumner", , "mdsumner@gmail.com", role = c("aut", "cre"))
+    c(person("Michael D.", "Sumner", , "mdsumner@gmail.com", role = c("aut", "cre")), 
+      person("Chrsi", "Toney", role = "ctb"))
 Description: Draw images easily and as if doing that was considered desirable or  
  even essential to be able to do. Set up 
  a plot with an image, specify where that image should be placed. Image plot by default
