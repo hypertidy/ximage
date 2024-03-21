@@ -88,14 +88,14 @@ flip_c <- function(x) {
 #' @examples
 #' ximage(volcano)
 #' ximage(as.raster(matrix(0:1, 49, 56)))
-ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
   UseMethod("ximage")
 }
 
 
 #' @export
 #' @importFrom stats na.omit
-ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
 
 
   if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
@@ -146,10 +146,10 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
 
   if (length(x) %in% c(3, 4)) {
     ximage(aperm(array(unlist(x), c(dimension[1:2], 3)), c(2, 1, length(x))),
-                 extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+                 extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
   } else {
     ximage(matrix(x[[1]], dimension[2L], byrow = TRUE),
-                   extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+                   extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
   }
   ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
 
@@ -161,9 +161,29 @@ ximage.raw <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = N
   if (all(c("width", "height", "depth") %in% names(attributes(x)))) {
     attrs <- attributes(x)
     x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
+    if (attrs$depth == 1) x<- x[,,1L, drop = TRUE]
   }
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+  ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
 }
+
+#' @export
+ximage.numeric <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
+  if (all(c("width", "height", "depth") %in% names(attributes(x)))) {
+    attrs <- attributes(x)
+    x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
+  }
+  ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
+}
+
+#' @export
+ximage.integer <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
+  if (all(c("width", "height", "depth") %in% names(attributes(x)))) {
+    attrs <- attributes(x)
+    x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
+  }
+  ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
+}
+
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
 
@@ -214,17 +234,25 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     #x <- .make_hex_matrix(x, cols = col )
     ## politely ignore numeric arrays with 3 or 4 slices
     dmx <- dim(x)
-    tt <- length(dmx %in% c(3, 4)) && is.numeric(x) ##&& all(x >= 0, na.rm = TRUE)
+    tt <- length(dmx) %in% c(3, 4) && is.numeric(x) ##&& all(x >= 0, na.rm = TRUE)
 
     #if (!tt && !is.null(col)) {
 
     if (!tt) {
       #browser()
       if (is.null(col)) col <-  colorRampPalette(grDevices::hcl.colors(12, "YlOrRd",
-                                                                                rev = TRUE))
+                                                                              rev = TRUE))
+
+
+      if (length(breaks) > 0 && !(length(breaks)-1) == length(col)) {
+
+        col <- colorRampPalette(col)(length(breaks)-1)
+      }
       x <- matrix(palr::image_pal(x, col, breaks = breaks), dim(x)[1L], dim(x)[2L])
     } else {
+      ## here would should nara
       x <- (x - rg[1L])/diff(rg)
+
 
     }
 

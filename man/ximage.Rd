@@ -13,7 +13,8 @@ ximage(
   ...,
   xlab = NULL,
   ylab = NULL,
-  col = hcl.colors(96, "YlOrRd", rev = TRUE)
+  col = hcl.colors(96, "YlOrRd", rev = TRUE),
+  breaks = NULL
 )
 }
 \arguments{
