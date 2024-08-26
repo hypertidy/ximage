@@ -80,7 +80,9 @@ flip_c <- function(x) {
 #' @param ... passed to plot when `add = FALSE`
 #' @param xlab x axis label, empty by default
 #' @param ylab y axis lable, empty by default
+#' @param breaks 	a set of finite numeric breakpoints for the colours:
 #' @param col optional colours to map matrix/array data to
+#'
 #' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
 #' @export
 #' @importFrom grDevices hcl.colors rgb
@@ -184,6 +186,7 @@ ximage.integer <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
   ximage.default(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
 }
 
+#' @importFrom grDevices colorRampPalette
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
 

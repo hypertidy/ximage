@@ -17,6 +17,7 @@ xcontour(x, extent = NULL, ..., add = FALSE)
     \item{\code{zlim}}{optional, range of data to set colour map (to maintain absolute colours across multiple plots)}
     \item{\code{xlab}}{x axis label, empty by default}
     \item{\code{ylab}}{y axis lable, empty by default}
+    \item{\code{breaks}}{a set of finite numeric breakpoints for the colours:}
     \item{\code{col}}{optional colours to map matrix/array data to}
   }}
 

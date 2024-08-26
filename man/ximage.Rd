@@ -33,6 +33,8 @@ ximage(
 \item{ylab}{y axis lable, empty by default}
 
 \item{col}{optional colours to map matrix/array data to}
+
+\item{breaks}{a set of finite numeric breakpoints for the colours:}
 }
 \value{
 a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
