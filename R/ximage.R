@@ -275,7 +275,8 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
 
-  if (anyNA(x)) x[is.na(x)] <- 1
+  #if (anyNA(x)) x[is.na(x)] <- 1
+  #browser()
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
   invisible(list(x = x, extent = extent))
 }

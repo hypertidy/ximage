@@ -1,9 +1,9 @@
 Package: ximage
 Title: Draw Images of Raster Data and Related Adornments
-Version: 0.0.0.9012
+Version: 0.0.0.9013
 Authors@R: 
     c(person("Michael D.", "Sumner", , "mdsumner@gmail.com", role = c("aut", "cre")), 
-      person("Chrsi", "Toney", role = "ctb"))
+      person("Chris", "Toney", role = "ctb"))
 Description: Draw images easily and as if doing that was considered desirable or  
  even essential to be able to do. Set up 
  a plot with an image, specify where that image should be placed. Image plot by default
@@ -18,6 +18,6 @@ Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 2.10)
 LazyData: true
-RoxygenNote: 7.3.0
+RoxygenNote: 7.3.2
 Imports: 
     palr

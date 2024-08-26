@@ -12,7 +12,7 @@ Draw images easily and as if doing that was considered desirable or even essenti
 
 Other contributors:
 \itemize{
-  \item Chrsi Toney [contributor]
+  \item Chris Toney [contributor]
 }
 
 }
