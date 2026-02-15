@@ -79,8 +79,8 @@ flip_c <- function(x) {
 #' @param add add to plot, or start afresh
 #' @param ... passed to plot when `add = FALSE`
 #' @param xlab x axis label, empty by default
-#' @param ylab y axis lable, empty by default
-#' @param breaks 	a set of finite numeric breakpoints for the colours:
+#' @param ylab y axis label, empty by default
+#' @param breaks a set of finite numeric breakpoints for the colours (optional, passed to underlying color mapping functions)
 #' @param col optional colours to map matrix/array data to
 #'
 #' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
