@@ -137,7 +137,6 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
     } else {
       ## can't read data in ximage
       stop("can't read data in the this package")
-#      x[[1]] <- as.vector(t(elevation(source = x[[1]], extent = attr(x, "extent"), dimension = attr(x, "dimension"), projection = attr(x, "projection"))))
     }
   }
 
@@ -153,7 +152,6 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
     ximage(matrix(x[[1]], dimension[2L], byrow = TRUE),
                    extent = extent,  zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
   }
-  ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
 
   ## return the materialized data
   invisible(x)
@@ -204,11 +202,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
     return(invisible(x_list))
   }
 
-  ## fastpng raw output
-  # if (is.raw(x) && all(c("width", "height", "depth") %in% names(attributes(x)))) {
-  #   attrs <- attributes(x)
-  #   x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
-  # }
+
 
   stopifnot(inherits(x, "array"))
 
@@ -233,16 +227,11 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 
     }
 
-
-    #x <- .make_hex_matrix(x, cols = col )
     ## politely ignore numeric arrays with 3 or 4 slices
     dmx <- dim(x)
     tt <- length(dmx) %in% c(3, 4) && is.numeric(x) ##&& all(x >= 0, na.rm = TRUE)
 
-    #if (!tt && !is.null(col)) {
-
     if (!tt) {
-      #browser()
       if (is.null(col)) col <-  colorRampPalette(grDevices::hcl.colors(12, "YlOrRd",
                                                                               rev = TRUE))
 
@@ -267,19 +256,14 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
   if (is.null(extent)) {
     extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
   }
-  ## if !add
-#  par(xaxs = "i", yaxs = "i")
   if (is.null(xlab)) xlab <- ""
   if (is.null(ylab)) ylab <- ""
 
   if (is.list(extent) && length(extent) == 2) {
     stop("meshplot not yet supported")
-    #ximage_meshplot(x, extent, add = add)
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
 
-  #if (anyNA(x)) x[is.na(x)] <- 1
-  #browser()
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
   invisible(list(x = x, extent = extent))
 }
@@ -294,7 +278,6 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
 
   if (is.list(extent) && length(extent) == 2) {
     stop("meshplot not yet supported")
-    #ximage_meshplot(x, extent, add = add)
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
@@ -314,37 +297,6 @@ ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab 
     c(xx, yy)
 }
 ximage_sf_data <- function(x, extent = NULL, ...) {
- #
- #  List of 19
- # $ filename            : chr "vrt:///vsicurl/https://gebco2022.s3.valeria.science/gebco_2022_complete_cog.tif?ovr=8"
- # $ driver              : chr [1:2] "VRT" "Virtual Raster"
- # $ cols                : num [1:2] 1 42
- # $ rows                : num [1:2] 1 21
- # $ bands               : int 1
- # $ crs                 :List of 2
- #  ..$ input: chr "WGS 84"
- #  ..$ wkt  : chr "GEOGCRS[\"WGS 84\",\n    ENSEMBLE[\"World Geodetic System 1984 ensemble\",\n        MEMBER[\"World Geodetic Sys"| __truncated__
- #  ..- attr(*, "class")= chr "crs"
- # $ geotransform        : num [1:6] -180 8.57 0 90 0 ...
- # $ datatype            : chr "Int16"
- # $ sub                 : chr NA
- # $ meta                : chr "AREA_OR_POINT=Area"
- # $ band_meta           :List of 1
- #  ..$ : chr(0)
- # $ attribute_tables    :List of 1
- #  ..$ : list()
- # $ color_tables        :List of 1
- #  ..$ : NULL
- # $ ranges              : num [1, 1:4] -32768 0 32767 0
- # $ blocksizes          : int [1, 1:2] 512 512
- # $ descriptions        : chr ""
- # $ default_geotransform: int 0
- # $ proxy               : logi FALSE
- # $ colorInterp         : int 1
- # - attr(*, "data")= num [1:42, 1:21] -3001 -3203 -3158 -2999 -2897 ...
- #  ..- attr(*, "units")= chr ""
- #
- #
   d <- attr(x, "data")
   dm <- dim(d)
   do_extent <- TRUE
