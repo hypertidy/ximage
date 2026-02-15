@@ -152,6 +152,19 @@ Based on the issues above, here's a suggested order for creating PRs:
 - Each issue can be converted into a focused PR following the priority order above
 - Consider grouping related issues (e.g., alpha-related issues) into single PRs if appropriate
 
+## Potential User-Friendly Improvements (From Code Analysis)
+
+The following improvements could enhance usability but are not critical for CRAN:
+
+1. **Input Validation**: Add validation for NULL/empty inputs before processing
+2. **Better Error Messages**: 
+   - Currently: "no dimension known", "can't read data in this package"
+   - Could be: More descriptive messages explaining what went wrong and how to fix it
+3. **Parameter Documentation**: Some parameters could benefit from more examples in documentation
+4. **Warning for Ignored Parameters**: When `zlim` is used with RGB data, it's ignored - could warn users
+5. **Helper Function Documentation**: Consider documenting `.rescale()` for users who might want to use it
+6. **Default Behavior Documentation**: Add more examples showing default vs. custom extent behavior
+
 ## Next Steps
 
 To continue from the lost session:
