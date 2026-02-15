@@ -41,7 +41,7 @@
 #' @param breaks a set of finite numeric breakpoints for the colours (optional, passed to underlying color mapping functions)
 #' @param col optional colours to map matrix/array data to
 #'
-#' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
+#' @return a list with components: 'x' (the input object or processed raster data) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
 #' @export
 #' @importFrom grDevices hcl.colors rgb
 #' @importFrom graphics rasterImage
@@ -227,7 +227,7 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 }
 
 #' @export
-#' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
+#' @return a list with components: 'x' (the input object) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
 ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
     if (is.null(extent)) {
     extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
@@ -244,7 +244,7 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
 }
 
 #' @export
-#' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
+#' @return a list with components: 'x' (the input object) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
 ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
   ximage.nativeRaster(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
 }
