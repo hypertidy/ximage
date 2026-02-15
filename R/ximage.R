@@ -1,50 +1,8 @@
-t0 <- function(x) {
-  d <- seq_len(length(dim(x)))
-  d[1:2] <- d[2:1]
-  aperm(x, d)
-}
-
-flip_r <- function(x) {
-  dm <- dim(x)
-  if (length(dm) == 3L) {
-    x[dm[1L]:1L,,]
-  } else {
-    x[dm[1L]:1L, ]
-  }
-}
-flip_c <- function(x) {
-  dm <- dim(x)
-  if (length(dm) == 3L) {
-    x[,dm[2L]:1L,]
-  } else {
-    x[,dm[2L]:1L]
-  }
-}
 
 .rescale <- function(x) {
   rg <- range(x, na.rm = TRUE)
   (x - rg[1L])/diff(rg)
 }
-.make_hex_matrix <- function(x, cols = NULL, ..., breaks) {
-   alpha <- 1
-  if (length(dim(x)) > 2) {
-    if (dim(x)[3] == 4L) {
-      alpha <- x[,,4L]
-    }
-    out <- matrix(rgb(x[,,1L], x[,,2L], x[,,3L], alpha), dim(x)[1L])
-  } else {
-
-    out <- matrix(cols[x * (length(cols) - 1) + 1], dim(x)[1L])
-  }
-  out
-}
-
-# TODO
-# dispatch matrix vs array using S3 class
-# autodetect maxcolorvalue as 1 or 255, or allow override
-# collapse RGB as intensity and allow colour map override
-# allow greyscale mode ?
-# allow raw mode
 
 #' A new image()
 
@@ -83,7 +41,7 @@ flip_c <- function(x) {
 #' @param breaks a set of finite numeric breakpoints for the colours (optional, passed to underlying color mapping functions)
 #' @param col optional colours to map matrix/array data to
 #'
-#' @return a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
+#' @return a list with components: 'x' (the input object or processed raster data) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
 #' @export
 #' @importFrom grDevices hcl.colors rgb
 #' @importFrom graphics rasterImage
@@ -124,7 +82,7 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
   projection <- NULL
 
   if (is.null(dimension)) {
-    if (is.null(dim(x[[1]]))) {
+    if (!is.null(dim(x[[1]]))) {
       dimension <- dim(x[[1]])
     } else {
     stop("no dimension known")
@@ -136,7 +94,7 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = 
       ## we have image data
     } else {
       ## can't read data in ximage
-      stop("can't read data in the this package")
+      stop("can't read data in this package")
     }
   }
 
@@ -269,7 +227,8 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab
 }
 
 #' @export
-ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
+#' @return a list with components: 'x' (the input object) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
+ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
     if (is.null(extent)) {
     extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
     }
@@ -281,11 +240,13 @@ ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i", xlab = xlab, ylab = ylab)
   graphics::rasterImage(x, extent[1], extent[3], extent[2], extent[4], interpolate = FALSE)
+  invisible(list(x = x, extent = extent))
 }
 
 #' @export
-ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE)) {
-  ximage.nativeRaster(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col)
+#' @return a list with components: 'x' (the input object) and 'extent' (a numeric vector of length 4 giving xmin, xmax, ymin, ymax; defaults to c(0, ncol, 0, nrow) if not supplied). Returned invisibly.
+ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,  col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL) {
+  ximage.nativeRaster(x, extent = extent, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab, col = col, breaks = breaks)
 }
 
 
@@ -310,7 +271,7 @@ ximage_sf_data <- function(x, extent = NULL, ...) {
     if (!is.null(extent)) warning("extent ignored for 1D array")
     extent <- NULL
   } else if (length(dm) > 2) {
-    d <- matrix(d[1:prod(dim[1:2])], dm[1], dm[2])
+    d <- matrix(d[1:prod(dm[1:2])], dm[1], dm[2])
   }
   if (do_extent) {
 
@@ -320,7 +281,7 @@ ximage_sf_data <- function(x, extent = NULL, ...) {
       gt[1] <- gt[1] + gt[2] * (x$cols[1] - 1)
     }
     if (x$rows[1] > 1) {
-      gt[4] <- gt[4] + gt[6] * (x$row[1] - 1)
+      gt[4] <- gt[4] + gt[6] * (x$rows[1] - 1)
     }
 
 

@@ -4,6 +4,20 @@ This document catalogs all open issues and potential PRs that were identified bu
 
 ## Recent Completed Work
 
+- **PR #20** (In Progress 2026-02-15): CRAN submission cleanup and code quality improvements
+  - Fixed critical logic error in `ximage.R` and `xcontour.R` (inverted `is.null()` check)
+  - Fixed typo in `ximage.R` (`x$row` → `x$rows`)
+  - Fixed variable reference bug in `ximage.R` (`dim` → `dm`)
+  - Fixed typos in error messages ("the this package" → "this package")
+  - Removed unused helper functions (`t0`, `flip_r`, `flip_c`, `.make_hex_matrix`)
+  - Removed unreachable code after `stop()` in `xcontour.R`
+  - Cleaned up commented-out code in `xcontour.R` and `xrect.R`
+  - Added `@return` documentation to `ximage.nativeRaster()` and `ximage.raster()`
+  - Added `breaks` parameter to `ximage.nativeRaster()` and `ximage.raster()` signatures
+  - Fixed typo in `xrect.R` documentation ("colummns" → "columns")
+  - Removed TODO comments (tracked in issues instead)
+  - Improved code consistency and CRAN compliance
+
 - **PR #19** (Merged 2026-02-15): Clean up codebase for CRAN submission
   - Removed empty `R/meshplot.R` file
   - Cleaned up commented-out code in `R/ximage.R`
@@ -137,6 +151,19 @@ Based on the issues above, here's a suggested order for creating PRs:
 - This document serves as a comprehensive roadmap based on all open issues
 - Each issue can be converted into a focused PR following the priority order above
 - Consider grouping related issues (e.g., alpha-related issues) into single PRs if appropriate
+
+## Potential User-Friendly Improvements (From Code Analysis)
+
+The following improvements could enhance usability but are not critical for CRAN:
+
+1. **Input Validation**: Add validation for NULL/empty inputs before processing
+2. **Better Error Messages**: 
+   - Currently: "no dimension known", "can't read data in this package"
+   - Could be: More descriptive messages explaining what went wrong and how to fix it
+3. **Parameter Documentation**: Some parameters could benefit from more examples in documentation
+4. **Warning for Ignored Parameters**: When `zlim` is used with RGB data, it's ignored - could warn users
+5. **Helper Function Documentation**: Consider documenting `.rescale()` for users who might want to use it
+6. **Default Behavior Documentation**: Add more examples showing default vs. custom extent behavior
 
 ## Next Steps
 

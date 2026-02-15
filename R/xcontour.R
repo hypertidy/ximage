@@ -14,8 +14,6 @@
 #' ex <-  c(2667394, 2668004, 6478902, 6479772)
 #' v <- volcano[nrow(volcano):1, ncol(volcano):1]
 #' ximage(v, extent = ex, asp = 1)
-#' #im <- whatarelief::imagery(extent = ex, projection = "+proj=nzmg +datum=WGS84")
-#' #ximage(im, add = TRUE, extent = ex)
 #' xcontour(v, add = TRUE, extent = ex, col = "white")
 #' xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
 xcontour <- function(x, extent = NULL, ..., add = FALSE) {
@@ -37,8 +35,6 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
   if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
     ## smells like sf
     stop("no xcontour for sf")
-    ximage_sf_data(x, extent = extent,  add = add, ...)
-    return(invisible(x))
   }
    ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
   attrs <- attributes(x)
@@ -51,7 +47,7 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
   projection <- NULL
 
   if (is.null(dimension)) {
-    if (is.null(dim(x[[1]]))) {
+    if (!is.null(dim(x[[1]]))) {
       dimension <- dim(x[[1]])
     } else {
     stop("no dimension known")
@@ -63,16 +59,12 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
       ## we have image data
     } else {
       ## can't read data in ximage
-      stop("can't read data in the this package")
-#      x[[1]] <- as.vector(t(elevation(source = x[[1]], extent = attr(x, "extent"), dimension = attr(x, "dimension"), projection = attr(x, "projection"))))
+      stop("can't read data in this package")
     }
   }
 
-
     xcontour(matrix(x[[1]], dimension[2L], byrow = TRUE),
                    extent = extent,  add = add, ...)
-
-  ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
 
   ## return the materialized data
   invisible(x)
