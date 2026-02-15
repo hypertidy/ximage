@@ -13,7 +13,7 @@ Description: Draw images easily and as if doing that was considered desirable or
  the 'graphics' package but with the good features celebrated and made easier to use. 
 License: MIT + file LICENSE
 Encoding: UTF-8
-Language: es
+Language: en
 Roxygen: list(markdown = TRUE)
 Depends: 
     R (>= 2.10)
