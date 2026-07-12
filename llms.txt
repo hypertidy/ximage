@@ -129,7 +129,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.003   0.000   0.004
+#>   0.004   0.000   0.003
 
 
 ## crank up the size it's still fast
@@ -143,7 +143,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.046   0.020   0.065
+#>   0.046   0.018   0.065
 ```
 
 ## Code of Conduct
@@ -161,7 +161,7 @@ Plot a matrix, array, nativeRaster, or GDAL reader output as an image,
 placed by extent, in raster order.
 
 - [`ximage()`](https://hypertidy.github.io/ximage/reference/ximage.md) :
-  Plot an image (no matter what)
+  Plot an image
 
 ## Adornments
 
@@ -169,7 +169,7 @@ Companions that share the layout conventions of ximage(), contours and
 labels at cell centres, rectangles from extents.
 
 - [`xcontour()`](https://hypertidy.github.io/ximage/reference/xcontour.md)
-  : A new contour
+  : Contour matrix data and draw
 - [`xtext()`](https://hypertidy.github.io/ximage/reference/xtext.md) :
   Label the cells of a matrix in place
 - [`xrect()`](https://hypertidy.github.io/ximage/reference/xrect.md) :

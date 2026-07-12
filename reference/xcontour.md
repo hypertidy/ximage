@@ -1,6 +1,6 @@
-# A new contour
+# Contour matrix data and draw
 
-To work with
+Like contour() but to work with
 [`ximage()`](https://hypertidy.github.io/ximage/reference/ximage.md)
 
 ## Usage
@@ -67,8 +67,8 @@ nothing, called for its side effect of creating or adding to a plot
 
 ## Details
 
-Input may be a matrix or a list from gdal_raster_data() in the vapour
-package.
+Input may be a matrix or a list from `gdal_raster_data()` in the vapour
+package or from `read_ds()` in the gdalraster package.
 
 ## Examples
 

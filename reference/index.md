@@ -6,7 +6,7 @@ Plot a matrix, array, nativeRaster, or GDAL reader output as an image,
 placed by extent, in raster order.
 
 - [`ximage()`](https://hypertidy.github.io/ximage/reference/ximage.md) :
-  Plot an image (no matter what)
+  Plot an image
 
 ## Adornments
 
@@ -14,7 +14,7 @@ Companions that share the layout conventions of ximage(), contours and
 labels at cell centres, rectangles from extents.
 
 - [`xcontour()`](https://hypertidy.github.io/ximage/reference/xcontour.md)
-  : A new contour
+  : Contour matrix data and draw
 - [`xtext()`](https://hypertidy.github.io/ximage/reference/xtext.md) :
   Label the cells of a matrix in place
 - [`xrect()`](https://hypertidy.github.io/ximage/reference/xrect.md) :

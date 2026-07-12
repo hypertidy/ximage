@@ -1,6 +1,8 @@
-# Plot an image (no matter what)
+# Plot an image
 
-ximage combines the best of image() and rasterImage().
+ximage combines the best of
+[`graphics::image()`](https://rdrr.io/r/graphics/image.html) and
+[`graphics::rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html).
 
 ## Usage
 
@@ -80,9 +82,8 @@ if not supplied)
 
 ## Details
 
-`ximage()` is designed like a graphics function with the following
-limitations removed, [`image()`](https://rdrr.io/r/graphics/image.html)
-1:4, [`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html) 5:7.
+`ximage()` is a combination those graphics function with the the best
+features in one.
 
 1.  Allow arrays with RGB/A.
 
