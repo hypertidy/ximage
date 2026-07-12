@@ -11,11 +11,11 @@
 #' @export
 #' @importFrom graphics contour
 #' @examples
-#' ex <-  c(2667394, 2668004, 6478902, 6479772)
+#' #EPSG:27200 see https://github.com/mdsumner/volcano
+#' ex <- c(2667400, 2668010, 6478700, 6479570)
 #' v <- volcano[nrow(volcano):1, ncol(volcano):1]
 #' ximage(v, extent = ex, asp = 1)
-#' #im <- whatarelief::imagery(extent = ex, projection = "+proj=nzmg +datum=WGS84")
-#' #ximage(im, add = TRUE, extent = ex)
+#'
 #' xcontour(v, add = TRUE, extent = ex, col = "white")
 #' xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
 xcontour <- function(x, extent = NULL, ..., add = FALSE) {

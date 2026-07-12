@@ -9,3 +9,4 @@
 ^PENDING_WORK\.md$
 ^\.positai$
 ^\.claude$
+^cran-comments\.md$

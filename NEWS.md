@@ -1,4 +1,4 @@
-# ximage 0.0
+# ximage 0.1.0
 
 * New function `xtext()` draws matrix values as labels at cell centres, in
  the same raster-order layout used by `ximage()` (thanks to a draft in
@@ -23,7 +23,7 @@
 
 * Fixed default extent for an array/matrix, it was transposed (!). 
 
-* ximage now dows what imfun in whatarelief did, i.e. with the output of gdal_raster_data, gdal_raster_dsn, gdal_raster_image do the obvious plot. 
+* ximage now does what imfun in whatarelief did, i.e. with the output of gdal_raster_data, gdal_raster_dsn, gdal_raster_image do the obvious plot. 
 
 * Add 'mesh_plot' mode to `ximage()`, not fully implemented. 
 

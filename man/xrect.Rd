@@ -2,7 +2,7 @@
 % Please edit documentation in R/xrect.R
 \name{xrect}
 \alias{xrect}
-\title{xrect}
+\title{Rectangles}
 \usage{
 xrect(x, add = FALSE, ..., asp = 1L)
 }
@@ -29,7 +29,6 @@ xrect(runif(100))
 xrect(sort(runif(100)))
 xrect(runif(100), col = hcl.colors(25, alpha = seq(.2, .8, length.out = 25)))
 
-#example(xcontour, ask = FALSE)
 ex <- c(0.2, 0.8, .2, .6)
 xrect(ex, add = TRUE, lwd = 5, lty = 2)
 }

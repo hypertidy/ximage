@@ -135,7 +135,7 @@ system.time(ximage(im, asp = 1))
 <img src="man/figures/README-imagery-2.png" alt="" width="100%" />
 
     #>    user  system elapsed 
-    #>   0.038   0.023   0.061
+    #>   0.046   0.020   0.065
 
 ## Code of Conduct
 
