@@ -12,7 +12,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Draw Images of Raster Data and Related Adornments">
-<meta property="og:description" content="Draw images easily and as if doing that was considered desirable or even essential to be able to do. Set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are (or will be) supported. A little bit like image() and rasterImage() from the graphics package but with the good features celebrated and made easier to use.">
+<meta property="og:description" content="Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are (or will be) supported. A combination of image() and rasterImage() from the graphics package with their good features in one place.">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
@@ -58,7 +58,14 @@
   <a href="news/index.html">Changelog</a>
 </li>
       </ul>
-<ul class="nav navbar-nav navbar-right"></ul>
+<ul class="nav navbar-nav navbar-right">
+<li>
+  <a href="https://github.com/hypertidy/ximage/" class="external-link">
+    <span class="fab fa-github fa-lg"></span>
+
+  </a>
+</li>
+      </ul>
 </div>
 <!--/.nav-collapse -->
   </div>
@@ -75,65 +82,83 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of ximage is to make something like ‘image()’ and ‘rasterImage()’ but without the missing functionality and useability.</p>
+<p>The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with the missing functionality and usability problems fixed. Draw an image from whatever you have, where you want it, with no dependencies beyond base R.</p>
 <p>ximage supports making images from</p>
 <ul>
 <li>numeric, character, byte matrix</li>
-<li>numeric array</li>
+<li>numeric array (including RGB/A, and grey/alpha)</li>
 <li>nativeRaster</li>
 <li>data returned from <code>vapour::gdal_raster_()</code> or <code>gdalraster::read_ds()</code> functions which include numeric, character, byte vectors or nativeRaster types</li>
 </ul>
-<p>The orientation is in “raster-order”, i.e. when you’re looking at the picture it’s topleft to topright, then scan lines down each row to the bottom (like western reading and <code>par(mfrow)</code> order).</p>
-<p>This matches the way that spatial data readers read imagery, and is equivalent to populating an R matrix with <code>matrix(&lt;&gt;, nrow, ncol, byrow  = TRUE)</code> (note backwards order of nrow,ncol). Please note that getting the data out of the matrix is not in this order, but it is with <code>as.vector(t(m))</code>. Higher dimensional arrays need more care, there’s no <code>byrow</code> for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code>.</p>
+<p>Missing values display as a colour of your choosing (<code>na.col</code>, transparent by default), a constant <code>alpha</code> can be applied over any input for overlay work, and <code>zlim</code> anchors absolute colours across multiple plots.</p>
+<p>Alongside <code><a href="reference/ximage.html">ximage()</a></code> there are matching adornment functions that share its layout conventions: <code><a href="reference/xcontour.html">xcontour()</a></code> (contours at cell centres), <code><a href="reference/xtext.html">xtext()</a></code> (cell values as labels), and <code><a href="reference/xrect.html">xrect()</a></code> (rectangles from extents).</p>
+<p>The orientation is in “raster order”, i.e. when you’re looking at the picture it’s top left to top right, then scan lines down each row to the bottom (like western reading and <code>par(mfrow)</code> order). This orientation is explored in <a href="https://hypertidy.github.io/ximage/articles/orientation.html" class="external-link">orientation</a> vignette.</p>
+<p>This matches the way that spatial data readers read imagery, and is equivalent to populating an R matrix with <code>matrix(&lt;&gt;, nrow, ncol, byrow = TRUE)</code> (note backwards order of nrow,ncol). Please note that getting the data out of the matrix is not in this order, but it is with <code>as.vector(t(m))</code>. Higher dimensional arrays need more care, there’s no <code>byrow</code> for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code>. The full story is in the package vignette: <code><a href="articles/orientation.html">vignette("orientation", package = "ximage")</a></code>.</p>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
+<p>Install the development version from GitHub:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"hypertidy/ximage"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>This is a basic example which shows you how to image a topographic dataset, with arbitrary image overlay placement.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">ximage</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span><span class="op">)</span>  <span class="co">## plot in the index space of the matrix</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-1.png" alt="" width="100%"></p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co">## or, plot in the geographic space (we happen to know this for this matrix)</span></span>
-<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">F</span><span class="op">)</span></span>
-<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_a</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">170</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">40</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>;<span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
-<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_a</span><span class="op">)</span>  <span class="co">## plot a RGB array</span></span>
-<span><span class="co">## plot  a native raster over the other in a different window</span></span>
-<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_n</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">## or, plot in the geographic space (we happen to know this for this matrix)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, axes <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_a</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">170</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">40</span>, <span class="op">-</span><span class="fl">30</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">80</span>, <span class="fl">100</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-example-3.png" alt="" width="100%"></p>
-<p>We can get imagery from the internet, and plot it very quickly.</p>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/box.html" class="external-link">box</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_a</span><span class="op">)</span>  <span class="co">## plot a RGB array, a new plot in its own index space</span></span>
+<span><span class="co">## overlay a native raster, and a matrix with its own palette</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_n</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">20</span>, <span class="fl">20</span>, <span class="fl">40</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">40</span>, <span class="fl">60</span>, <span class="fl">30</span>, <span class="fl">50</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">256</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-example-3.png" alt="" width="100%"></p>
+<p>Missing values and constant transparency are first-class: here the ocean is set to missing and displays as <code>na.col</code>, and an RGB overlay is applied with constant <code>alpha</code>.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">land</span> <span class="op">&lt;-</span> <span class="va">topo</span></span>
+<span><span class="va">land</span><span class="op">[</span><span class="va">land</span> <span class="op">&lt;</span> <span class="fl">0</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">topo</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">64</span>, <span class="st">"Blues 3"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">land</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">180</span>, <span class="fl">180</span>, <span class="op">-</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>       col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">64</span>, <span class="st">"Terrain 2"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">logo_a</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">60</span>, <span class="fl">60</span>, <span class="op">-</span><span class="fl">80</span>, <span class="op">-</span><span class="fl">35</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, alpha <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-colours-1.png" alt="" width="100%"></p>
+<p>We can get imagery from the internet, and plot it very quickly.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/vapour" class="external-link">vapour</a></span><span class="op">)</span>  </span>
 <span><span class="va">virtual_earth</span> <span class="op">&lt;-</span>  <span class="st">"&lt;GDAL_WMS&gt;&lt;Service name=\"VirtualEarth\"&gt;&lt;ServerUrl&gt;http://a${server_num}.ortho.tiles.virtualearth.net/tiles/a${quadkey}.jpeg?g=90&lt;/ServerUrl&gt;&lt;/Service&gt;&lt;MaxConnections&gt;4&lt;/MaxConnections&gt;&lt;Cache/&gt;&lt;/GDAL_WMS&gt;"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">px</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/dev.size.html" class="external-link">dev.size</a></span><span class="op">(</span><span class="st">"px"</span><span class="op">)</span></span>
-<span><span class="va">px</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">px</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
+<span><span class="va">px</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/which.min.html" class="external-link">which.min</a></span><span class="op">(</span><span class="va">px</span><span class="op">)</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span>  <span class="co">## zero means GDAL fills this dimension, preserving aspect</span></span>
 <span></span>
 <span><span class="co">## change lon_0 and lat_0 to anywhere you like</span></span>
 <span><span class="va">im</span> <span class="op">&lt;-</span> <span class="fu">gdal_raster_nara</span><span class="op">(</span><span class="va">virtual_earth</span>, target_ext <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">3e5</span>, target_dim <span class="op">=</span> <span class="va">px</span>, target_crs <span class="op">=</span> <span class="st">"+proj=laea +lon_0=147 +lat_0=-42"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">im</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-imagery-1.png" alt="" width="100%"></p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt;   0.003   0.000   0.003</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a></span>
-<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="do">## crank up the size it's still fast</span></span>
-<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>px <span class="ot">&lt;-</span> px <span class="sc">*</span> <span class="dv">4</span></span>
-<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>im <span class="ot">&lt;-</span> <span class="fu">gdal_raster_nara</span>(virtual_earth, <span class="at">target_ext =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fl">3e5</span>, <span class="at">target_dim =</span> px, <span class="at">target_crs =</span> <span class="st">"+proj=laea +lon_0=147 +lat_0=-42"</span>)</span>
-<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
-<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">ximage</span>(im, <span class="at">asp =</span> <span class="dv">1</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.003   0.000   0.004</span></span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="do">## crank up the size it's still fast</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>px <span class="ot">&lt;-</span> px <span class="sc">*</span> <span class="dv">4</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>im <span class="ot">&lt;-</span> <span class="fu">gdal_raster_nara</span>(virtual_earth, <span class="at">target_ext =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="sc">-</span><span class="dv">1</span>, <span class="dv">1</span>) <span class="sc">*</span> <span class="fl">3e5</span>, <span class="at">target_dim =</span> px, <span class="at">target_crs =</span> <span class="st">"+proj=laea +lon_0=147 +lat_0=-42"</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">ximage</span>(im, <span class="at">asp =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="reference/figures/README-imagery-2.png" alt="" width="100%"></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co">#&gt;   0.040   0.024   0.063</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.038   0.023   0.061</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>
@@ -144,7 +169,15 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2 data-toc-skip>Links</h2>
+<ul class="list-unstyled">
+<li><a href="https://github.com/hypertidy/ximage/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/hypertidy/ximage/issues" class="external-link">Report a bug</a></li>
+</ul>
+</div>
+
+<div class="license">
 <h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
