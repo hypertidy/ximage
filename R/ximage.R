@@ -1,9 +1,8 @@
-#' Plot an image (no matter what)
+#' Plot an image
 #'
-#' ximage combines the best of image() and rasterImage().
+#' ximage combines the best of `graphics::image()` and `graphics::rasterImage()`.
 #'
-#' [ximage()] is designed like a graphics function with the following
-#' limitations removed, `image()` 1:4, `rasterImage()` 5:7.
+#' [ximage()] is a combination those graphics function with the the best features in one.
 #'
 #' \enumerate{
 #'    \item Allow arrays with RGB/A.

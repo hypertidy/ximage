@@ -2,7 +2,7 @@
 % Please edit documentation in R/xcontour.R
 \name{xcontour}
 \alias{xcontour}
-\title{A new contour}
+\title{Contour matrix data and draw}
 \usage{
 xcontour(x, extent = NULL, ..., add = FALSE)
 }
@@ -34,10 +34,11 @@ nativeRaster input}
 nothing, called for its side effect of creating or adding to a plot
 }
 \description{
-To work with \code{\link[=ximage]{ximage()}}
+Like contour() but to work with \code{\link[=ximage]{ximage()}}
 }
 \details{
-Input may be a matrix or a list from gdal_raster_data() in the vapour package.
+Input may be a matrix or a list from \code{gdal_raster_data()} in the vapour package or from \code{read_ds()}
+in the gdalraster package.
 }
 \examples{
 #EPSG:27200 see https://github.com/mdsumner/volcano

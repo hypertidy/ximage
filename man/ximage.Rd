@@ -2,7 +2,7 @@
 % Please edit documentation in R/ximage.R
 \name{ximage}
 \alias{ximage}
-\title{Plot an image (no matter what)}
+\title{Plot an image}
 \usage{
 ximage(
   x,
@@ -53,11 +53,10 @@ invisibly, a list with 'x' (the colour data as plotted) and
 the input if not supplied)
 }
 \description{
-ximage combines the best of image() and rasterImage().
+ximage combines the best of \code{graphics::image()} and \code{graphics::rasterImage()}.
 }
 \details{
-\code{\link[=ximage]{ximage()}} is designed like a graphics function with the following
-limitations removed, \code{image()} 1:4, \code{rasterImage()} 5:7.
+\code{\link[=ximage]{ximage()}} is a combination those graphics function with the the best features in one.
 
 \enumerate{
 \item Allow arrays with RGB/A.

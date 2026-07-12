@@ -1,8 +1,9 @@
-#' A new contour
+#' Contour matrix data and draw
 #'
-#' To work with [ximage()]
+#' Like contour() but to work with [ximage()]
 #'
-#' Input may be a matrix or a list from gdal_raster_data() in the vapour package.
+#' Input may be a matrix or a list from `gdal_raster_data()` in the vapour package or from `read_ds()`
+#' in the gdalraster package.
 #'
 #' @param x something we can contour
 #' @inheritParams ximage
