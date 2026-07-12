@@ -91,12 +91,15 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   }
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
   dimension <- attrs$dimension
-  ## GDAL reader output is row-major vectors with a dimension attribute in
-  ## (ncol, nrow) convention; a list of plain matrices is already oriented
-  el_is_matrix <- !is.null(dim(x[[1L]])) && length(dim(x[[1L]])) >= 2L
+  ## a dimension attribute (vapour, gdalraster gis) means the elements hold
+  ## GDAL row-major data, whether stored as vectors or as (ncol, nrow)
+  ## matrices (e.g. from asplit()); with no dimension attribute a matrix
+  ## element is taken to be an already-oriented R matrix
+  row_major <- !is.null(dimension)
   if (is.null(dimension)) {
-    if (el_is_matrix) {
-      dimension <- dim(x[[1L]])[2:1]
+    dm1 <- dim(x[[1L]])
+    if (!is.null(dm1) && length(dm1) >= 2L) {
+      dimension <- dm1[2:1]
     } else {
       stop("no dimension known")
     }
@@ -121,19 +124,23 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   }
 
   if (length(x) %in% c(3, 4)) {
-    if (el_is_matrix) {
-      arr <- array(unlist(x, use.names = FALSE), c(dim(x[[1L]])[1:2], length(x)))
-    } else {
-      arr <- aperm(array(unlist(x, use.names = FALSE),
+    if (row_major) {
+      arr <- aperm(array(unlist(lapply(x, as.vector), use.names = FALSE),
                          c(dimension[1:2], length(x))),
                    c(2, 1, 3))
+    } else {
+      arr <- array(unlist(x, use.names = FALSE), c(dim(x[[1L]])[1:2], length(x)))
     }
     out <- ximage(arr,
                   extent = extent, zlim = zlim, add = add, ...,
                   xlab = xlab, ylab = ylab, col = col, breaks = breaks,
                   alpha = alpha, na.col = na.col)
   } else {
-    m <- if (el_is_matrix) x[[1L]] else matrix(x[[1L]], dimension[2L], byrow = TRUE)
+    m <- if (row_major) {
+      matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
+    } else {
+      x[[1L]]
+    }
     out <- ximage(m,
                   extent = extent, zlim = zlim, add = add, ...,
                   xlab = xlab, ylab = ylab, col = col, breaks = breaks,

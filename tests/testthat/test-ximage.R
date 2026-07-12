@@ -63,13 +63,38 @@ test_that("a list holding a plain matrix is not scrambled", {
   })
 })
 
-test_that("gdalraster-style gis attribute inputs work", {
+test_that("gdalraster read_ds() style inputs are correctly oriented", {
   with_null_device({
+    ## faithful simulation of read_ds(): row-major band-sequential vector
+    ## with a gis attribute; bbox is (xmin, ymin, xmax, ymax),
+    ## dim is (xsize, ysize, nbands), datatype is extra and ignored
     gis <- list(type = "raster", bbox = c(0, 0, 4, 3), dim = c(4L, 3L, 1L),
-                srs = "EPSG:4326")
-    gv <- structure(as.numeric(1:12), gis = gis)
+                srs = "EPSG:32610", datatype = "Int16")
+    ## image is 4 cols x 3 rows: row 1 = 1,2,3,4 ... row 3 = 9,10,11,12
+    gv <- structure(1:12, gis = gis)
     res <- ximage(gv)
     expect_identical(res$extent, c(0, 4, 0, 3))
+    ref <- ximage(matrix(1:12, 3, byrow = TRUE))
+    expect_identical(dim(res$x), c(3L, 4L))
+    expect_identical(res$x, ref$x)
+
+    ## same data as a numeric (double) vector dispatches identically
+    res_d <- ximage(structure(as.numeric(1:12), gis = gis))
+    expect_identical(res_d$x, ref$x)
+
+    ## multi-band bare vector, band-sequential
+    gis3 <- gis
+    gis3$dim <- c(4L, 3L, 3L)
+    gv3 <- structure(c(1:12, 1:12, 1:12) / 12, gis = gis3)
+    res3 <- ximage(gv3)
+    expect_identical(dim(res3$x), c(3L, 4L))
+    ## grey RGB from identical bands: top-left darkest, bottom-right lightest
+    expect_true(res3$x[1, 1] < res3$x[3, 4])
+
+    ## read_ds(as_list = TRUE) style: list of band vectors with gis attr
+    gl <- structure(list(as.numeric(1:12)), gis = gis)
+    resl <- ximage(gl)
+    expect_identical(resl$x, ref$x)
   })
 })
 
