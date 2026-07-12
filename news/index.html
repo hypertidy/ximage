@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ximage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9015</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9016</span>
       </span>
     </div>
 
@@ -25,6 +25,16 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/orientation.html">Array orientation: raster order and the R matrix</a>
+    </li>
+  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -43,7 +53,9 @@
 
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.0" id="ximage-00">ximage 0.0<a class="anchor" aria-label="anchor" href="#ximage-00"></a></h2>
-<ul><li><p>Now support raw output of fastpng.</p></li>
+<ul><li><p>New function <code><a href="../reference/xtext.html">xtext()</a></code> draws matrix values as labels at cell centres, in the same raster-order layout used by <code><a href="../reference/ximage.html">ximage()</a></code> (thanks to a draft in issue #22). Supports vapour and gdalraster reader-output lists.</p></li>
+<li><p>New vignette “Array orientation: raster order and the R matrix” explains the raster-order convention, the <code>byrow = TRUE</code> and <code>as.vector(t(m))</code> round trip, multi-band <code><a href="https://rdrr.io/r/base/aperm.html" class="external-link">aperm()</a></code> recipes, and the cell-edge extent convention (#14).</p></li>
+<li><p>Now support raw output of fastpng.</p></li>
 <li><p>Now support {gdalraster} output of <code>read_ds(, as_list = TRUE)</code> or raw numeric, thanks to Chris Toney.</p></li>
 <li><p><code><a href="../reference/ximage.html">ximage()</a></code> now handles <code>breaks</code> argument to go with <code>col</code> (for numeric input).</p></li>
 <li><p><code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> now works with list output from gdalnara (same as gdal_raster_image but with nativeRaster).</p></li>
