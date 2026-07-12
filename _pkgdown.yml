@@ -1,0 +1,56 @@
+url: https://hypertidy.github.io/ximage/
+
+template:
+  bootstrap: 5
+  light-switch: true
+
+home:
+  title: ximage - draw images of raster data
+  links:
+  - text: hypertidy on GitHub
+    href: https://github.com/hypertidy
+  - text: vapour (GDAL raster/vector reader)
+    href: https://hypertidy.github.io/vapour/
+  - text: gdalraster (GDAL API bindings)
+    href: https://usdaforestservice.github.io/gdalraster/
+
+navbar:
+  structure:
+    left: [intro, reference, articles, news]
+    right: [search, github, lightswitch]
+
+reference:
+- title: Draw images
+  desc: >
+    Plot a matrix, array, nativeRaster, or GDAL reader output as an image,
+    placed by extent, in raster order.
+  contents:
+  - ximage
+
+- title: Adornments
+  desc: >
+    Companions that share the layout conventions of ximage(), contours and
+    labels at cell centres, rectangles from extents.
+  contents:
+  - xcontour
+  - xtext
+  - xrect
+
+- title: Data
+  desc: >
+    Small datasets used in examples, world topography and the R logo as
+    RGB array and nativeRaster.
+  contents:
+  - topo
+  - logo_a
+
+articles:
+- title: Concepts
+  navbar: ~
+  contents:
+  - orientation
+
+news:
+  releases:
+  - text: ximage 0.1.0
+    href: https://github.com/hypertidy/ximage/releases
