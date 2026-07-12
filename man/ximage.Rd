@@ -2,8 +2,7 @@
 % Please edit documentation in R/ximage.R
 \name{ximage}
 \alias{ximage}
-\title{A new image()
-Plot an image (no matter what)}
+\title{Plot an image (no matter what)}
 \usage{
 ximage(
   x,
@@ -14,15 +13,20 @@ ximage(
   xlab = NULL,
   ylab = NULL,
   col = hcl.colors(96, "YlOrRd", rev = TRUE),
-  breaks = NULL
+  breaks = NULL,
+  alpha = NULL,
+  na.col = "transparent"
 )
 }
 \arguments{
-\item{x}{matrix, array, or native raster (nativeRaster, or raster)}
+\item{x}{matrix, array, raw or character matrix, native raster
+(nativeRaster, or raster), or list as output by GDAL reader functions}
 
 \item{extent}{optional, numeric xmin,xmax,ymin,ymax}
 
-\item{zlim}{optional, range of data to set colour map (to maintain absolute colours across multiple plots)}
+\item{zlim}{optional, absolute range of data to map colours to (maintains
+comparable colours across plots); values outside display as 'na.col';
+single-band numeric data only}
 
 \item{add}{add to plot, or start afresh}
 
@@ -30,26 +34,35 @@ ximage(
 
 \item{xlab}{x axis label, empty by default}
 
-\item{ylab}{y axis lable, empty by default}
+\item{ylab}{y axis label, empty by default}
 
-\item{col}{optional colours to map matrix/array data to}
+\item{col}{colours to map single-band data to}
 
-\item{breaks}{a set of finite numeric breakpoints for the colours:}
+\item{breaks}{a set of finite numeric breakpoints for the colours, one more
+break than colour (if not, colours are interpolated to fit)}
+
+\item{alpha}{optional constant opacity in \verb{[0, 1]} (or vector/matrix,
+recycled) applied on top of any existing alpha channel; not supported for
+nativeRaster input}
+
+\item{na.col}{colour for missing values, default "transparent"}
 }
 \value{
-a list with 'x' and 'extent' invisibly (extent is the 0,ncol 0,nrow space of the array if not supplied)
+invisibly, a list with 'x' (the colour data as plotted) and
+'extent' (xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of
+the input if not supplied)
 }
 \description{
 ximage combines the best of image() and rasterImage().
 }
 \details{
-\code{\link[=ximage]{ximage()}} is designed like graphics function with the following limitations removed,
-\code{image()} 1:4, \code{rasterImage()} 5:7.
+\code{\link[=ximage]{ximage()}} is designed like a graphics function with the following
+limitations removed, \code{image()} 1:4, \code{rasterImage()} 5:7.
 
 \enumerate{
 \item Allow arrays with RGB/A.
 \item Allow matrix with character (named colours, or hex) or raw (Byte) values
-\item Allow list output from vapour, a list with numeric values, hex character, or nativeRaster
+\item Allow list output from vapour or gdalraster, a list with numeric values, hex character, or nativeRaster
 \item Plot in 0,ncol 0,nrow by default
 \item Override default with extent (xmin, xmax, ymin, ymax)
 
@@ -58,12 +71,20 @@ ximage combines the best of image() and rasterImage().
 \item Plot by default in 0,ncol,0,nrow if unspecified.
 }
 
-ximage uses the GIS raster default used by rasterImage. WIP: There is a similar function 'image0?'
-that provides the same features but assumes that orientation is like image...
+Data orientation is "raster order", the first cell is the top-left of the
+displayed image, following scan lines down the page (see the package
+vignette on orientation).
 
-Colours by 'col' are only mapped for numeric data, this may change (to remap RGB or raw imagery via greyscale conversion)
+Colour mapping via 'col', 'breaks', and 'zlim' applies to single-band
+numeric data only. Multi-band (grey/alpha, RGB, RGBA) data is scaled
+automatically: values within 0,1 are used as-is, within 0,255 are divided
+by 255, and anything else is rescaled by the finite range of the colour
+bands. Missing values (NA, NaN) display as 'na.col' in all cases.
 }
 \examples{
 ximage(volcano)
 ximage(as.raster(matrix(0:1, 49, 56)))
+v <- volcano
+v[v > 180] <- NA
+ximage(v, na.col = "hotpink")
 }

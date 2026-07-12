@@ -12,13 +12,20 @@ xcontour(x, extent = NULL, ..., add = FALSE)
 \item{extent}{optional, numeric xmin,xmax,ymin,ymax}
 
 \item{...}{
-  Arguments passed on to \code{\link[=ximage]{ximage}}
+  Arguments passed on to \code{\link{ximage}}
   \describe{
-    \item{\code{zlim}}{optional, range of data to set colour map (to maintain absolute colours across multiple plots)}
+    \item{\code{zlim}}{optional, absolute range of data to map colours to (maintains
+comparable colours across plots); values outside display as 'na.col';
+single-band numeric data only}
     \item{\code{xlab}}{x axis label, empty by default}
-    \item{\code{ylab}}{y axis lable, empty by default}
-    \item{\code{breaks}}{a set of finite numeric breakpoints for the colours:}
-    \item{\code{col}}{optional colours to map matrix/array data to}
+    \item{\code{ylab}}{y axis label, empty by default}
+    \item{\code{col}}{colours to map single-band data to}
+    \item{\code{breaks}}{a set of finite numeric breakpoints for the colours, one more
+break than colour (if not, colours are interpolated to fit)}
+    \item{\code{alpha}}{optional constant opacity in \verb{[0, 1]} (or vector/matrix,
+recycled) applied on top of any existing alpha channel; not supported for
+nativeRaster input}
+    \item{\code{na.col}}{colour for missing values, default "transparent"}
   }}
 
 \item{add}{add to plot, or start afresh}

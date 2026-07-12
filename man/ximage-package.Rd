@@ -10,6 +10,11 @@ Draw images easily and as if doing that was considered desirable or even essenti
 \author{
 \strong{Maintainer}: Michael D. Sumner \email{mdsumner@gmail.com}
 
+Authors:
+\itemize{
+  \item Michael D. Sumner \email{mdsumner@gmail.com}
+}
+
 Other contributors:
 \itemize{
   \item Chris Toney [contributor]

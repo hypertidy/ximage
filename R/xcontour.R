@@ -51,10 +51,12 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
   projection <- NULL
 
   if (is.null(dimension)) {
-    if (is.null(dim(x[[1]]))) {
-      dimension <- dim(x[[1]])
+    dm1 <- dim(x[[1L]])
+    if (!is.null(dm1) && length(dm1) >= 2L) {
+      ## element is a matrix, convert (nrow, ncol) to (ncol, nrow) convention
+      dimension <- dm1[2:1]
     } else {
-    stop("no dimension known")
+      stop("no dimension known")
     }
   }
  if (!is.null(attrs$projection)) projection <- attrs$projection

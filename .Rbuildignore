@@ -7,3 +7,5 @@
 ^\.github$
 ^gdalwmscache$
 ^PENDING_WORK\.md$
+^\.positai$
+^\.claude$
