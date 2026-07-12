@@ -23,8 +23,9 @@ xcontour <- function(x, extent = NULL, ..., add = FALSE) {
 }
 #' @export
 xcontour.default <- function(x, extent = NULL, ..., add = FALSE) {
-  x <- t(x[nrow(x):1, ])
+  ## default extent is the index space of the input, before reorientation
   if (is.null(extent)) extent <- c(0, ncol(x), 0, nrow(x))
+  x <- t(x[nrow(x):1, ])
   xre <- diff(extent[1:2])/nrow(x)
   yre <- diff(extent[3:4])/ncol(x)
   xx <- seq(extent[1] + xre/2, extent[2] - xre/2, length.out = nrow(x) )

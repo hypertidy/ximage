@@ -1,5 +1,14 @@
 # ximage 0.0
 
+* New function `xtext()` draws matrix values as labels at cell centres, in
+ the same raster-order layout used by `ximage()` (thanks to a draft in
+ issue #22). Supports vapour and gdalraster reader-output lists.
+
+* New vignette "Array orientation: raster order and the R matrix" explains
+ the raster-order convention, the `byrow = TRUE` and `as.vector(t(m))`
+ round trip, multi-band `aperm()` recipes, and the cell-edge extent
+ convention (#14).
+
 * Now support raw output of fastpng. 
 
 * Now support {gdalraster} output of `read_ds(, as_list = TRUE)` or raw numeric, thanks to Chris Toney. 
