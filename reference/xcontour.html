@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">ximage</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9014</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9015</span>
       </span>
     </div>
 
@@ -64,19 +64,30 @@
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Arguments passed on to <code><a href="ximage.html">ximage</a></code></p><dl><dt><code>zlim</code></dt>
-<dd><p>optional, range of data to set colour map (to maintain absolute colours across multiple plots)</p></dd>
+<dd><p>optional, absolute range of data to map colours to (maintains
+comparable colours across plots); values outside display as 'na.col';
+single-band numeric data only</p></dd>
 
     <dt><code>xlab</code></dt>
 <dd><p>x axis label, empty by default</p></dd>
 
     <dt><code>ylab</code></dt>
-<dd><p>y axis lable, empty by default</p></dd>
-
-    <dt><code>breaks</code></dt>
-<dd><p>a set of finite numeric breakpoints for the colours:</p></dd>
+<dd><p>y axis label, empty by default</p></dd>
 
     <dt><code>col</code></dt>
-<dd><p>optional colours to map matrix/array data to</p></dd>
+<dd><p>colours to map single-band data to</p></dd>
+
+    <dt><code>breaks</code></dt>
+<dd><p>a set of finite numeric breakpoints for the colours, one more
+break than colour (if not, colours are interpolated to fit)</p></dd>
+
+    <dt><code>alpha</code></dt>
+<dd><p>optional constant opacity in <code>[0, 1]</code> (or vector/matrix,
+recycled) applied on top of any existing alpha channel; not supported for
+nativeRaster input</p></dd>
+
+    <dt><code>na.col</code></dt>
+<dd><p>colour for missing values, default "transparent"</p></dd>
 
 
 </dl></dd>
@@ -119,7 +130,7 @@
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
       </footer></div>
