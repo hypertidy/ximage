@@ -128,7 +128,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.003   0.000   0.003
+#>   0.004   0.000   0.004
 
 
 ## crank up the size it's still fast
@@ -142,7 +142,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.050   0.015   0.066
+#>   0.042   0.048   0.090
 ```
 
 ## Code of Conduct
