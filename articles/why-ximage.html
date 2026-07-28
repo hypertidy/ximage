@@ -244,46 +244,27 @@ faster.</p>
 <div class="section level2">
 <h2 id="neighbours-png-nara-farver">Neighbours: png, nara, farver<a class="anchor" aria-label="anchor" href="#neighbours-png-nara-farver"></a>
 </h2>
-<p>nativeRaster appears in surprisingly few places across R, and the
-packages that do take it seriously each occupy a different corner. The
-format itself comes from grDevices (introduced alongside
-<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> in R 2.11, 2010) but for years the main way
-to encounter one was <code>png::readPNG(native = TRUE)</code>, and I/O
-is still the png/jpeg/fastpng corner: nativeRaster as the thing a
-decoder hands you and an encoder accepts, with fastpng adding the
-width/height/depth attributed raw vectors that ximage also
-understands.</p>
+<p>nativeRaster appears in surprisingly few places across R, and there’s
+no integration but also very little overlap. The format itself comes
+from grDevices (introduced alongside <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> in R
+2.11, 2010) but for years the main way to encounter one was
+<code>png::readPNG(native = TRUE)</code>, and I/O is still the
+png/jpeg/fastpng corner: nativeRaster as the thing a decoder hands you
+and an encoder accepts, with fastpng adding the width/height/depth
+attributed raw vectors that ximage also understands.</p>
 <p>coolbutuseless/nara treats nativeRaster as a <em>canvas</em>: a
 mutable framebuffer of packed ints, drawn on in-place at C speed with
 points, lines, polygons, blitting and sprite operations, aimed at
 realtime rendering and games. It converts to and from arrays and rasters
-but its heart is imperative drawing, and it delegates both I/O and
-display (the same <code>grid.raster()</code>/<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>
-fast path ximage uses).</p>
+for imperative drawing.</p>
 <p>farver owns the colour math: vectorized colour space conversion and
 encoding without ever touching a string, and
 <code>encode_native()</code> / <code>decode_native()</code> map directly
 between colour values and the packed integer format. It is the
-industrial-strength version of ximage’s one choke point, and if ximage
-ever took a dependency, farver at <code>to_hex()</code> would be the one
-worth taking.</p>
-<p>ximage’s corner is the remaining one: <em>data</em> display. Not
-drawing shapes, not colour science, not I/O, but the orientation and
-extent bookkeeping that connects scientific arrays and flat GDAL reads
-to <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>. All four packages share the same
-underlying conviction, that raster order plus packed pixels plus
-<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> is the fast path R has had all along, and
-each takes a different seat around it.</p>
-</div>
-<div class="section level2">
-<h2 id="the-shape-of-the-package">The shape of the package<a class="anchor" aria-label="anchor" href="#the-shape-of-the-package"></a>
-</h2>
-<p>ximage follows the hypertidy pattern: a thin wrapper over a fast
-primitive, no dependencies beyond base R, and conventions borrowed from
-the data formats rather than invented. Everything reduces to one choke
-point (values to colours) and one call (<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>). The
-rest is orientation bookkeeping, which is exactly the part worth getting
-right once so nobody has to think about it again.</p>
+industrial-strength version of ximage’s <code>to_hex()</code>.</p>
+<p>ximage’s corner is the <em>data</em> display, just the orientation
+and extent bookkeeping that connects scientific arrays and flat GDAL
+reads to <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

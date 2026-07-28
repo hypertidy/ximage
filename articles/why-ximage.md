@@ -192,9 +192,9 @@ in R, produce nativeRaster and everything downstream gets faster.
 
 ## Neighbours: png, nara, farver
 
-nativeRaster appears in surprisingly few places across R, and the
-packages that do take it seriously each occupy a different corner. The
-format itself comes from grDevices (introduced alongside
+nativeRaster appears in surprisingly few places across R, and there’s no
+integration but also very little overlap. The format itself comes from
+grDevices (introduced alongside
 [`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html) in R
 2.11, 2010) but for years the main way to encounter one was
 `png::readPNG(native = TRUE)`, and I/O is still the png/jpeg/fastpng
@@ -205,35 +205,15 @@ vectors that ximage also understands.
 coolbutuseless/nara treats nativeRaster as a *canvas*: a mutable
 framebuffer of packed ints, drawn on in-place at C speed with points,
 lines, polygons, blitting and sprite operations, aimed at realtime
-rendering and games. It converts to and from arrays and rasters but its
-heart is imperative drawing, and it delegates both I/O and display (the
-same
-`grid.raster()`/[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html)
-fast path ximage uses).
+rendering and games. It converts to and from arrays and rasters for
+imperative drawing.
 
 farver owns the colour math: vectorized colour space conversion and
 encoding without ever touching a string, and `encode_native()` /
 `decode_native()` map directly between colour values and the packed
-integer format. It is the industrial-strength version of ximage’s one
-choke point, and if ximage ever took a dependency, farver at `to_hex()`
-would be the one worth taking.
+integer format. It is the industrial-strength version of ximage’s
+`to_hex()`.
 
-ximage’s corner is the remaining one: *data* display. Not drawing
-shapes, not colour science, not I/O, but the orientation and extent
+ximage’s corner is the *data* display, just the orientation and extent
 bookkeeping that connects scientific arrays and flat GDAL reads to
-[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html). All four
-packages share the same underlying conviction, that raster order plus
-packed pixels plus
-[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html) is the
-fast path R has had all along, and each takes a different seat around
-it.
-
-## The shape of the package
-
-ximage follows the hypertidy pattern: a thin wrapper over a fast
-primitive, no dependencies beyond base R, and conventions borrowed from
-the data formats rather than invented. Everything reduces to one choke
-point (values to colours) and one call
-([`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html)). The
-rest is orientation bookkeeping, which is exactly the part worth getting
-right once so nobody has to think about it again.
+[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html).
