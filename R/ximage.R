@@ -81,7 +81,14 @@
 #' ## message listing candidate shapes (ncol x nrow); here the guess 87x61
 #' ## is the mirror of the true 61x87, so pick from the candidates
 #' ximage(as.vector(t(volcano)))
+#'
+#' ## we don't get the right shape because our image is vertically tall
+#' ## set manually
 #' ximage(matrix(as.vector(t(volcano)), ncol = 61, byrow = TRUE))
+#'
+#' ## see that with the transpose form (landscape orientation) our guess is corrrect
+#' ## but is that what was intended? (impossible to determine completely automatically)
+#' ximage(as.vector(volcano))
 ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                    xlab = NULL, ylab = NULL,
                    col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
