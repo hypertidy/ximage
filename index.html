@@ -75,7 +75,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with the missing functionality and usability problems fixed. Draw an image from whatever you have, where you want it, with no dependencies beyond base R.</p>
+<p>The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with the missing functionality and usability problems fixed. Draw an image where you want it easily</p>
 <p>ximage supports making images from</p>
 <ul>
 <li>numeric, character, byte matrix</li>
@@ -86,7 +86,7 @@
 <p>Missing values display as a colour of your choosing (<code>na.col</code>, transparent by default), a constant <code>alpha</code> can be applied over any input for overlay work, and <code>zlim</code> anchors absolute colours across multiple plots.</p>
 <p>Alongside <code><a href="reference/ximage.html">ximage()</a></code> there are matching adornment functions that share its layout conventions: <code><a href="reference/xcontour.html">xcontour()</a></code> (contours at cell centres), <code><a href="reference/xtext.html">xtext()</a></code> (cell values as labels), and <code><a href="reference/xrect.html">xrect()</a></code> (rectangles from extents).</p>
 <p>The orientation is in “raster order”, i.e. when you’re looking at the picture it’s top left to top right, then scan lines down each row to the bottom (like western reading and <code>par(mfrow)</code> order). This orientation is explored in <a href="https://hypertidy.github.io/ximage/articles/orientation.html">orientation</a> vignette.</p>
-<p>This matches the way that spatial data readers read imagery, and is equivalent to populating an R matrix with <code>matrix(&lt;&gt;, nrow, ncol, byrow = TRUE)</code> (note backwards order of nrow,ncol). Please note that getting the data out of the matrix is not in this order, but it is with <code>as.vector(t(m))</code>. Higher dimensional arrays need more care, there’s no <code>byrow</code> for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code>. The full story is in the package vignette: <code><a href="articles/orientation.html">vignette("orientation", package = "ximage")</a></code>.</p>
+<p>This matches the way that spatial data readers read imagery, and is equivalent to populating an R matrix with <code>matrix(&lt;&gt;, nrow, ncol, byrow = TRUE)</code> (note it’s literally y,x in terms of number of rows then number of columns). Please note that getting the data out of the matrix is not in this order, but it is with <code>as.vector(t(m))</code>. Higher dimensional arrays need more care, there’s no <code>byrow</code> for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code>. The full story is in the package vignette: <code><a href="articles/orientation.html">vignette("orientation", package = "ximage")</a></code>.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -141,7 +141,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">im</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-imagery-1.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.004   0.000   0.003</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.003   0.000   0.003</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="do">## crank up the size it's still fast</span></span>
@@ -151,7 +151,7 @@
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">ximage</span>(im, <span class="at">asp =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="reference/figures/README-imagery-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.046   0.018   0.065</span></span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.050   0.015   0.066</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>

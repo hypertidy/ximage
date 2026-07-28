@@ -85,27 +85,23 @@
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span></code></pre></div>
-<div class="section level2">
-<h2 id="the-short-version">The short version<a class="anchor" aria-label="anchor" href="#the-short-version"></a>
-</h2>
 <p>ximage draws data in <em>raster order</em>: the first cell of your
 matrix is the top-left of the picture, and each row of the matrix is a
 scan line reading left to right, down the page. This is the order of
-western reading, of <code>par(mfrow)</code>, and of every image format
-and spatial data reader (GDAL, PNG, JPEG, satellite scan lines).</p>
+western reading, of <code>par(mfrow)</code>, and most image formats and
+spatial data readers (GDAL, PNG, JPEG, scan lines).</p>
 <p>If you have a stream of pixel values in that order, the R matrix that
 ximage expects is</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">values</span>, <span class="va">nrow</span>, <span class="va">ncol</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">matrix</span>(values, <span class="at">nrow =</span> <span class="sc">&lt;</span>no<span class="sc">-</span>of<span class="sc">-</span>pixels<span class="sc">-</span><span class="cf">in</span><span class="sc">-</span>y<span class="sc">-</span>direction<span class="sc">&gt;</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
+<p>Note that <code>nrow</code> is tied to the length of values, the
+number of columns for that matrix is inferred and not required
+explicitly.</p>
 <p>(note that <code>nrow</code> here is the number of scan lines, and
 that R asks for dimensions as nrow,ncol while image formats declare them
 as ncol,nrow). The round trip back to the pixel stream is
 <code>as.vector(t(m))</code>, because getting values <em>out</em> of a
 matrix is always column-major - there is no <code>byrow</code> for
 extraction, and none for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code> at all.</p>
-<p>Everything else in this vignette is a demonstration of why those two
-lines are the whole story.</p>
-</div>
 <div class="section level2">
 <h2 id="seeing-the-layout">Seeing the layout<a class="anchor" aria-label="anchor" href="#seeing-the-layout"></a>
 </h2>

@@ -2,8 +2,7 @@
 
 The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with
 the missing functionality and usability problems fixed. Draw an image
-from whatever you have, where you want it, with no dependencies beyond
-base R.
+where you want it easily
 
 ximage supports making images from
 
@@ -39,12 +38,12 @@ vignette.
 
 This matches the way that spatial data readers read imagery, and is
 equivalent to populating an R matrix with
-`matrix(<>, nrow, ncol, byrow = TRUE)` (note backwards order of
-nrow,ncol). Please note that getting the data out of the matrix is not
-in this order, but it is with `as.vector(t(m))`. Higher dimensional
-arrays need more care, there’s no `byrow` for
-[`array()`](https://rdrr.io/r/base/array.html). The full story is in the
-package vignette:
+`matrix(<>, nrow, ncol, byrow = TRUE)` (note it’s literally y,x in terms
+of number of rows then number of columns). Please note that getting the
+data out of the matrix is not in this order, but it is with
+`as.vector(t(m))`. Higher dimensional arrays need more care, there’s no
+`byrow` for [`array()`](https://rdrr.io/r/base/array.html). The full
+story is in the package vignette:
 [`vignette("orientation", package = "ximage")`](https://hypertidy.github.io/ximage/articles/orientation.md).
 
 ## Installation
@@ -129,7 +128,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.004   0.000   0.003
+#>   0.003   0.000   0.003
 
 
 ## crank up the size it's still fast
@@ -143,7 +142,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.046   0.018   0.065
+#>   0.050   0.015   0.066
 ```
 
 ## Code of Conduct
