@@ -22,8 +22,8 @@ knitr::opts_chunk$set(
 <!-- badges: end -->
 
 The goal of ximage is to be like 'image()' and 'rasterImage()' but with the
-missing functionality and usability problems fixed. Draw an image from
-whatever you have, where you want it, with no dependencies beyond base R.
+missing functionality and usability problems fixed. Draw an image where you want
+it easily
 
 ximage supports making images from
 
@@ -44,13 +44,14 @@ The orientation is in "raster order", i.e. when you're looking at the
 picture it's top left to top right, then scan lines down each row to the
 bottom (like western reading and `par(mfrow)` order). This orientation is explored in [orientation](https://hypertidy.github.io/ximage/articles/orientation.html) vignette. 
 
-This matches the way that spatial data readers read imagery, and is
-equivalent to populating an R matrix with `matrix(<>, nrow, ncol, byrow = TRUE)`
-(note backwards order of nrow,ncol). Please note that getting the data out
-of the matrix is not in this order, but it is with `as.vector(t(m))`.
-Higher dimensional arrays need more care, there's no `byrow` for `array()`.
-The full story is in the package vignette:
+This matches the way that spatial data readers read imagery, and is equivalent
+to populating an R matrix with `matrix(<>, nrow, ncol, byrow = TRUE)` (note it's
+literally y,x in terms of number of rows then number of columns). Please note
+that getting the data out of the matrix is not in this order, but it is with
+`as.vector(t(m))`. Higher dimensional arrays need more care, there's no `byrow`
+for `array()`. The full story is in the package vignette:
 `vignette("orientation", package = "ximage")`.
+
 
 ## Installation
 

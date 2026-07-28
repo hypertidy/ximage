@@ -20,20 +20,21 @@ knitr::opts_chunk$set(
 library(ximage)
 ```
 
-## The short version
-
 ximage draws data in *raster order*: the first cell of your matrix is the
 top-left of the picture, and each row of the matrix is a scan line reading
 left to right, down the page. This is the order of western reading, of
-`par(mfrow)`, and of every image format and spatial data reader (GDAL, PNG,
-JPEG, satellite scan lines).
+`par(mfrow)`, and most image formats and spatial data readers (GDAL, PNG,
+JPEG, scan lines).
 
 If you have a stream of pixel values in that order, the R matrix that ximage
 expects is
 
 ```r
-matrix(values, nrow, ncol, byrow = TRUE)
+matrix(values, nrow = <no-of-pixels-in-y-direction>, byrow = TRUE)
 ```
+
+Note that `nrow` is tied to the length of values, the number of columns for that matrix is 
+inferred and not required explicitly. 
 
 (note that `nrow` here is the number of scan lines, and that R asks for
 dimensions as nrow,ncol while image formats declare them as ncol,nrow). The
@@ -41,8 +42,6 @@ round trip back to the pixel stream is `as.vector(t(m))`, because getting
 values *out* of a matrix is always column-major - there is no `byrow` for
 extraction, and none for `array()` at all.
 
-Everything else in this vignette is a demonstration of why those two lines
-are the whole story.
 
 ## Seeing the layout
 
