@@ -4,6 +4,10 @@
 #'
 #' Calls [rect()], but will instantiate a plot if `add = FALSE`.
 #'
+#' A way of generating input to this function is to use `extent_from_cell` in the
+#' vaster package, `vapour_read_extent` in the vapour package, or various tiling logic tools
+#' in spatial packages.
+#'
 #' @param x four columns worth of rectangles
 #' @param add instantiate a plot or add to existing (default is `add = FALSE`)
 #' @param ... arguments passed to [rect()]

@@ -45,7 +45,7 @@
 #' bands. Missing values (NA, NaN) display as 'na.col' in all cases.
 #'
 #' @param x matrix, array, raw or character matrix, native raster
-#'   (nativeRaster, or raster), or list as output by GDAL reader functions
+#'   (nativeRaster, or raster), or list as output by GDAL reader functions, or atomic vector (guessing will apply)
 #' @param extent optional, numeric xmin,xmax,ymin,ymax
 #' @param zlim optional, absolute range of data to map colours to (maintains
 #'   comparable colours across plots); values outside display as 'na.col';
