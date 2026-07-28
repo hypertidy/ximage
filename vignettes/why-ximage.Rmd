@@ -25,30 +25,30 @@ library(ximage)
 Base R has two ways to draw a grid of pixels, and neither one does the
 whole job.
 
-`image()` will map data to colours, but that is where the good news
-ends. It cannot handle RGB imagery at all: three channels of colour have
-to be heroically de-mapped into a single index plus a constructed
-palette before `image()` will touch them. It builds a polygon per cell,
-which grinds on grids of any real size. And its `list(x, y, z)` input
-convention, with cell-centre coordinate vectors, is bookkeeping that has
-nothing to do with the picture.
+`image()` will map data to colours, but that is where the good news ends. It
+cannot handle RGB imagery at all: three channels of colour have to be converted
+to  a constructed palette before `image()`, the  `list(x, y, z)` input
+convention with cell-centre coordinate vectors (or cell-edge vectors) is 1990s
+legacy that is hard to use, and the default placement of a matrix in the unit
+square gives no easy reference to the size or shape of the data even with aspect
+ratio set to 1.
 
-`rasterImage()` draws colours to the device fast, top-left first, and
-has done since 2010. But it *only* takes colours, never data values. It
-cannot initiate a plot, something must already have set up a window. It
-wants corner coordinates rather than an extent. And it shares no input
-structure with `image()`, so there is no smooth path from one to the
-other.
+`rasterImage()` draws colours to the device fast, top-left first, and has done
+since 2010. But it *only* takes colours or R's native raster or data values
+within 0,1. It cannot initiate a plot, something must already have set up a
+window. It wants separate scalar parameters for xmin, ymin, xmax, ymax (in that
+order), and it shares no input structure with `image()`, so there is no smooth
+path from one to the other.
 
-So the mapping function cannot draw properly and the drawing function
-cannot map, and moving between them means restructuring everything. Then
-the icing on the cake: the two disagree about orientation. `image()`
-treats a matrix as a field z(x, y), first dimension along x, y
-increasing upwards, so the picture is your matrix transposed and flipped
-relative to how it prints. `rasterImage()` reads top-left first like
-every image format, scanning sensor, and spatial data reader in
-existence. This difference is **really confusing**, and it ambushes
-everyone eventually.
+The mapping function cannot draw properly and the drawing function cannot map,
+and moving between them means fighting with the plumbing. They also disagree
+about orientation: `image()` treats a matrix as a field z(x, y), first dimension
+along x, y increasing upwards, so the picture is your matrix transposed and
+flipped relative to how it prints. `rasterImage()` reads top-left first like
+most image formats, scanning sensor, spatial data readers, and western writing.
+This difference is **really confusing**, and feels like it was just unfinished.
+
+
 
 ```{r image-flip}
 m <- matrix(as.double(1:12), 3, byrow = TRUE)
@@ -60,9 +60,9 @@ xtext(m, add = TRUE, cex = 2)
 par(op)
 ```
 
-## ximage is the missing middle
+## ximage is a start on the finish
 
-ximage does the whole job: it maps values to colours when you give it
+ximage does everything we had complaints about above: maps values to colours when you give it
 data (or passes colours straight through when you already have them,
 including RGB arrays and nativeRaster), it initiates the plot itself
 from an extent, and it hands the result to `rasterImage()` in one
@@ -75,6 +75,34 @@ ximage(volcano, extent = c(0, 610, 0, 870))
 ```
 
 Note: `volcano` as stored is not Maungawhau's real orientation in "north-up" geography, its orientation as a visually striking example for `image()` was established in R's earliest days: see [github volcano package](https://github.com/mdsumner/volcano) for the georeferenced truth.
+
+## Index space: the default extent
+
+Giving a four-value extent (xmin, xmax, ymin, ymax) is optional. Without
+one, ximage draws into (0, ncol) x (0, nrow), the index space of the
+data itself: x measured in columns, y in rows, cell edges on whole
+numbers. This is the pixel coordinate system of imagery, the space a
+geotransform maps to the world, so the default means "no georeferencing
+yet" rather than no meaning at all.
+
+Compare the unit square of `image()`, which maps every matrix  to (0, 1) x (0,
+1) regardless of what it is. An R plot fills the device by default, its aspect
+ratio is dynamic, and that is fine on its own, but a unit square on top of it
+leaves the data in an entirely abstract space with no reference to the size or
+shape of the grid: a 10 x 3000 strip and a square tile draw identically. In
+index space the axes report the dimensions, coordinates in `add = TRUE`
+overplots mean cell positions, and one further step recovers the true shape:
+`asp = 1` makes cells square on the device, so the picture takes the actual
+proportions of the data rather than the proportions of the window. It is not
+even the unit square, *cell centres* are mapped to the bounds 0,1 which means
+the size of the data gives a slightly different overlap for the default picture.
+
+
+The same index space used by ximage is the default in stars and terra
+(`terra::rast(volcano)` reports extent 0, 61, 0, 87) - a convention this author
+argued for in both projects early on: a grid's natural home is its own
+dimensions until georeferencing says otherwise.
+
 
 ## Data that already knows its shape
 
@@ -110,7 +138,7 @@ and 4-plane (RGBA) pixel-interleaved interpretations, because raw
 genuinely is byte data and byte image buffers are overwhelmingly stored
 that way.
 
-## Where this points: nativeRaster
+## nativeRaster
 
 The fastest representation of a colour image in R is not a matrix of hex
 strings and not a 3-way array of doubles, it is `nativeRaster`: one
