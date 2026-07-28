@@ -57,6 +57,11 @@ xcontour(x, extent = NULL, ..., add = FALSE)
 
   :   colour for missing values, default "transparent"
 
+  `force`
+
+  :   proceed with a guessed dimension for very long bare vectors (see
+      Details), default `FALSE`
+
 - add:
 
   add to plot, or start afresh

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ximage</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -18,7 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/orientation.html">Array orientation: raster order and the R matrix</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/why-ximage.html">Why ximage</a></li>
+    <li><a class="dropdown-item" href="../articles/orientation.html">Array orientation: raster order and the R matrix</a></li>
+    <li><a class="dropdown-item" href="../articles/dynamic-drawing.html">Dynamic drawing: from ximage to a live canvas</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-news" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">News</button>
@@ -67,6 +69,70 @@
 <span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  na.col <span class="op">=</span> <span class="st">"transparent"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'raw'</span></span>
+<span><span class="fu">ximage</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  extent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">96</span>, <span class="st">"YlOrRd"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na.col <span class="op">=</span> <span class="st">"transparent"</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'numeric'</span></span>
+<span><span class="fu">ximage</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  extent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">96</span>, <span class="st">"YlOrRd"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na.col <span class="op">=</span> <span class="st">"transparent"</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'integer'</span></span>
+<span><span class="fu">ximage</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  extent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">96</span>, <span class="st">"YlOrRd"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na.col <span class="op">=</span> <span class="st">"transparent"</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'character'</span></span>
+<span><span class="fu">ximage</span><span class="op">(</span></span>
+<span>  <span class="va">x</span>,</span>
+<span>  extent <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  zlim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  add <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span>,</span>
+<span>  xlab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  col <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/grDevices/palettes.html" class="external-link">hcl.colors</a></span><span class="op">(</span><span class="fl">96</span>, <span class="st">"YlOrRd"</span>, rev <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  na.col <span class="op">=</span> <span class="st">"transparent"</span>,</span>
+<span>  force <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -123,6 +189,11 @@ nativeRaster input</p></dd>
 <dt id="arg-na-col">na.col<a class="anchor" aria-label="anchor" href="#arg-na-col"></a></dt>
 <dd><p>colour for missing values, default "transparent"</p></dd>
 
+
+<dt id="arg-force">force<a class="anchor" aria-label="anchor" href="#arg-force"></a></dt>
+<dd><p>proceed with a guessed dimension for very long bare vectors
+(see Details), default <code>FALSE</code></p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -144,6 +215,23 @@ the input if not supplied)</p>
 </ol><p>Data orientation is "raster order", the first cell is the top-left of the
 displayed image, following scan lines down the page (see the package
 vignette on orientation).</p>
+<p>Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
+width/height/depth attributes) are accepted and a dimension is guessed
+by integer-division detection of the vector length. The most nearly
+square factorization is chosen (preferring landscape, ncol &gt;= nrow) and
+the data is assumed to be in raster scanline order, i.e. flat output
+from GDAL readers such as <code>vapour::gdal_raster_data()</code> or
+<code>gdalraster::read_ds()</code>, built as <code>matrix(x, ncol = NC, byrow = TRUE)</code>;
+column-major R data needs <code>dim(x) &lt;- c(NR, NC)</code> instead. A message
+reports the guess and the candidate factorizations from 1xN through
+Nx1, in GDAL dimension order (ncol x nrow, xsize x ysize). Raw
+vectors also consider 3-plane (RGB) and 4-plane (RGBA) scanline
+pixel-interleaved interpretations; numeric data never gets a plane
+interpretation (whole numbers in 0..255 are too common as ordinary
+data to imply an image, a much narrower opt-in detection may come
+later). For very long vectors (more than
+<code>getOption("ximage.guess_max", 2^24)</code> elements) the guess stops with
+an error unless <code>force = TRUE</code>, or set the dimension explicitly.</p>
 <p>Colour mapping via 'col', 'breaks', and 'zlim' applies to single-band
 numeric data only. Multi-band (grey/alpha, RGB, RGBA) data is scaled
 automatically: values within 0,1 are used as-is, within 0,255 are divided
@@ -161,6 +249,17 @@ bands. Missing values (NA, NaN) display as 'na.col' in all cases.</p>
 <span class="r-in"><span><span class="va">v</span><span class="op">[</span><span class="va">v</span> <span class="op">&gt;</span> <span class="fl">180</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="cn">NA</span></span></span>
 <span class="r-in"><span><span class="fu">ximage</span><span class="op">(</span><span class="va">v</span>, na.col <span class="op">=</span> <span class="st">"hotpink"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="ximage-3.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co">## bare vectors in GDAL scanline order get a guessed dimension, with a</span></span></span>
+<span class="r-in"><span><span class="co">## message listing candidate shapes (ncol x nrow); here the guess 87x61</span></span></span>
+<span class="r-in"><span><span class="co">## is the mirror of the true 61x87, so pick from the candidates</span></span></span>
+<span class="r-in"><span><span class="fu">ximage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> guessing dimension for vector of length 5,307</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   using ncol x nrow = 87 x 61 (GDAL xsize x ysize), as matrix(x, ncol = 87, byrow = TRUE)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span>   candidates (ncol x nrow): 1x5307, 3x1769, 29x183, 61x87, [87x61], 183x29, 1769x3, 5307x1</span>
+<span class="r-plt img"><img src="ximage-4.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu">ximage</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">volcano</span><span class="op">)</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">61</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="ximage-5.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

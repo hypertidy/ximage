@@ -1,0 +1,201 @@
+# Dynamic drawing: from ximage to a live canvas
+
+This is a reference document to consider drawing vector primitives over
+raster backgrounds, and making the background a dynamic window onto GDAL
+sources, with pan and zoom. Status: musing with a working pre-alpha
+kernel (wkpeek + nara would nearly do it today).
+
+## The lesson
+
+ximage exists because base R had two functions that would not compose:
+[`image()`](https://rdrr.io/r/graphics/image.html) could map data to
+colours but not draw properly,
+[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html) could
+draw but not map, they shared no input structure, and only one of them
+could initiate a plot. ximage did not invent anything, it closed a gap
+between existing primitives by committing to one convention (raster
+order, extent) and doing the bookkeeping once.
+
+The same gap-shaped hole exists one level up. R has fast geometry
+streaming (wk, geos), a fast mutable pixel canvas (nara), fast raster
+sourcing at arbitrary window and resolution (GDAL via vapour and
+gdalraster), fast image decode (fastpng), a fast blit to screen
+(rasterImage, via ximage), and even an event loop (eventloop). Nobody
+has committed to the convention that composes them. This document is
+about what that convention is, and it turns out we already wrote it
+down.
+
+## Everything is one transform
+
+The convention is the affine between world coordinates and pixel
+coordinates, which is to say: the GDAL geotransform. A “view” is nothing
+but a pixel canvas plus a world extent, and the affine falls out of
+those two things. wkpeek already states this in six lines:
+
+``` r
+
+trans <- wk::wk_affine_compose(
+  wk::wk_affine_translate(dx = -xmin, dy = -ymax),
+  wk::wk_affine_scale(
+    scale_x =  ncol / (xmax - xmin),
+    scale_y = -nrow / (ymax - ymin)   # negative: y flips, raster order
+  )
+)
+geom_px <- wk::wk_transform(geom, trans)
+```
+
+That negative y scale is the same orientation commitment ximage makes:
+raster order, top-left first, the convention of every image format and
+every GDAL read. Once a view is (extent, dim), then
+
+- painting a raster background is a GDAL read *at that extent and dim*
+  (warp does the resampling and reprojection, we never touch it),
+- painting geometry is one `wk_transform()` by the affine and then
+  integer pixel drawing,
+- pan and zoom are pure arithmetic on the extent, followed by repaint,
+- display is one blit of the finished canvas.
+
+No layer in that stack needs to know about any other layer. That is the
+ximage property, and it is why this can stay thin.
+
+## The pieces on the table
+
+**wkpeek** (github.com/mdsumner/wkpeek) is the existing pre-alpha and
+proves the whole loop end to end: a wk object drives a bbox, a zoom
+level is chosen, XYZ tiles are fetched and composited into a canvas, the
+world-to-pixel affine is built, and the geometry is drawn over the
+background in pixel space. Its canvas is magick and its drawing is the
+magick device, which is the right proof and the wrong engine: magick
+copies on every operation and draws through a device, so it is a
+snapshot tool, not a frame loop.
+
+**nara** is the engine wkpeek’s proof asks for. A nativeRaster is a
+mutable framebuffer of packed ints, and nara draws on it in place at C
+speed: `nr_fill()`, `nr_polyline()`, `nr_polygon()`, `nr_circle()`,
+`nr_blit()` for compositing decoded tiles or sprites, `nr_crop()` and
+`nr_copy_into()` for the scroll tricks below. Swapping magick for nara
+turns the snapshot into a frame.
+
+**wk and geos** are the geometry side. wk streams coordinates without
+building objects, `wk_transform()` applies the affine in one pass, and
+geos supplies the operation a live view actually needs constantly:
+clipping geometry to the (slightly padded) view extent before
+rasterizing, so panning across a continent-sized layer only ever touches
+what is visible.
+
+**vapour and gdalraster** make the background dynamic. wkpeek fetches
+XYZ tiles, but tiles are just one source; `gdal_raster_data()` with a
+target extent and dimension is the general form, and it means the
+background can be a COG on S3, a Zarr virtualized through VRT, a local
+GeoTIFF, or a tile server through GDAL’s own drivers, all warped to the
+view on demand. The dynamic window *is* the GDAL read. (The tile math
+currently inlined in wkpeek is grout’s job, and should go home to
+grout/tilemath.)
+
+**fastpng** closes a loop within the loop: it decodes PNG tiles directly
+to nativeRaster, so tile bytes become blittable pixels with no
+intermediate representation at all. Tiles from cache to canvas without
+leaving packed ints.
+
+**eventloop** (coolbutuseless) supplies input: keyboard and mouse
+polling against an x11 device, which is exactly enough for pan by drag
+or arrow keys and zoom by wheel or +/-. It is x11 only, which bounds the
+ambition honestly (see below).
+
+**ximage** keeps the job it has: the final blit. `ximage(nr, extent)`
+puts the finished frame on a device with correct orientation and world
+axes, and remains the way a non-interactive user gets the same picture
+in a plain R session or an Rmd chunk.
+
+## The shape of a pre-alpha
+
+Small enough to write in full:
+
+``` r
+
+view <- function(extent, dim, crs = "EPSG:3857") {
+  structure(list(extent = extent, dim = dim, crs = crs,
+                 nr = nara::nr_new(dim[1], dim[2], "grey90")),
+            class = "nrview")
+}
+
+world_to_px <- function(v) {
+  e <- v$extent
+  wk::wk_affine_compose(
+    wk::wk_affine_translate(dx = -e[1], dy = -e[4]),
+    wk::wk_affine_scale(scale_x =  v$dim[1] / (e[2] - e[1]),
+                        scale_y = -v$dim[2] / (e[4] - e[3])))
+}
+
+paint_raster <- function(v, dsn) {
+  d <- vapour::gdal_raster_data(dsn, target_ext = v$extent,
+                                target_dim = v$dim, target_crs = v$crs,
+                                bands = 1:3)
+  ## pack bands to nativeRaster ints, blit into v$nr
+  invisible(v)
+}
+
+paint_geom <- function(v, g, color = "hotpink") {
+  g <- wk::wk_transform(g, world_to_px(v))
+  ## unpack coordinates, nara::nr_polyline(v$nr, xs, ys, color)
+  invisible(v)
+}
+
+pan  <- function(v, dx, dy) { v$extent <- v$extent + c(dx, dx, dy, dy); repaint(v) }
+zoom <- function(v, f) { v$extent <- zoom_extent(v$extent, f); repaint(v) }
+
+show <- function(v) ximage::ximage(v$nr, extent = v$extent)
+```
+
+Wrap `repaint()` and the pan/zoom keys in an eventloop handler and that
+is the demo: any GDAL source as a live background, any wk geometry over
+it, arrows to pan, wheel to zoom, on x11. Every function above is a thin
+call into a package that already exists; the only genuinely new code is
+coordinate unpacking from wk into nara’s drawing calls, and band-packing
+GDAL output into nativeRaster ints (both are small, both are candidates
+for wk handlers and for farver::encode_native respectively).
+
+Two classic renderer tricks are available cheaply when wanted, and
+should be resisted until the naive version is measured. Panning by whole
+pixels is a `nr_copy_into()` of the surviving region plus a GDAL read of
+only the exposed strip. And a zoom can display instantly by blitting the
+current canvas scaled (`nr_resize()`) while the real read happens, the
+universal slippy-map illusion. GDAL warp of a local or cached source at
+screen resolution is fast enough that the naive full-repaint version is
+likely usable as-is, which is the correct pre-alpha.
+
+## What this is not
+
+This is not a challenge to QGIS, deck.gl, or the D3/js world, and true
+interactivity for real work probably does live there (QGIS bindings, or
+htmlwidgets over the same GDAL sources). The bounds are structural: R
+graphics devices have no event model, so input is eventloop’s x11
+polling or nothing; there is no picking, no continuous render guarantee,
+no touch, no GPU. What this *is*: the proof that R’s own primitives
+compose into a live map view with almost no new code, a debugging and
+exploration tool that stays inside an R session, and a concrete exhibit
+for the R \> 5.0 wish that underlies it all, which is an event model on
+graphics devices. If that wish ever lands, this stack is standing there
+waiting for it.
+
+## Coordination notes
+
+The pieces have owners and the seams are natural. nara and eventloop are
+coolbutuseless (Mike FC), and any serious frame-loop work should happen
+with him, likely as issues or PRs against nara for whatever drawing
+primitives turn out missing (anti-aliased lines are the known gap for
+map aesthetics). The wk affine and handler API is paleolimbot (Dewey)
+territory, and “unpack a wk stream into nara draw calls” is a textbook
+wk handler. GDAL windowed reads are already the daily bread of vapour
+and gdalraster (Chris Toney). The tile math consolidates into grout.
+wkpeek is the sandbox where the composition gets proven before anything
+asks for a home.
+
+## Immediate next steps
+
+Swap wkpeek’s canvas from magick to nara, keeping the tile source
+(fastpng decode straight to nativeRaster, nr_blit to composite). Replace
+the magick device drawing with nr_polyline on transformed coordinates.
+Add `gdal_raster_data()` as an alternative background source to tiles.
+Only then add eventloop pan/zoom, because the first three steps are
+useful without it and testable in any session.

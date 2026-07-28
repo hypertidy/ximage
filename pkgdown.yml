@@ -2,8 +2,10 @@ pandoc: 3.8.3
 pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
+  articles/dynamic-drawing: dynamic-drawing.html
   orientation: orientation.html
-last_built: 2026-07-12T08:29Z
+  why-ximage: why-ximage.html
+last_built: 2026-07-28T05:57Z
 urls:
   reference: https://hypertidy.github.io/ximage/reference
   article: https://hypertidy.github.io/ximage/articles

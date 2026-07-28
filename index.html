@@ -11,8 +11,8 @@
 <script src="deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="ximage - draw images of raster data">
-<meta name="description" content="Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are (or will be) supported. A combination of image() and rasterImage() from the graphics package with their good features in one place.">
-<meta property="og:description" content="Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are (or will be) supported. A combination of image() and rasterImage() from the graphics package with their good features in one place.">
+<meta name="description" content="Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are supported. Flat vectors are supported in a limited sense with a heuristic to guess at the likely dimensionality and some helpers. A combination of image() and rasterImage() from the graphics package with their good features in one place.">
+<meta property="og:description" content="Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default reflects the index of the image data itself, or can be specified in simple extent terms xmin,xmax,ymin,ymax. Numeric matrices, integer arrays, byte arrays, character arrays, and native rasters are supported. Flat vectors are supported in a limited sense with a heuristic to guess at the likely dimensionality and some helpers. A combination of image() and rasterImage() from the graphics package with their good features in one place.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ximage</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0.9001</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,7 +35,9 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/orientation.html">Array orientation: raster order and the R matrix</a></li>
+<li><a class="dropdown-item" href="articles/why-ximage.html">Why ximage</a></li>
+    <li><a class="dropdown-item" href="articles/orientation.html">Array orientation: raster order and the R matrix</a></li>
+    <li><a class="dropdown-item" href="articles/dynamic-drawing.html">Dynamic drawing: from ximage to a live canvas</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -160,6 +162,7 @@
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
+<li><a href="https://cloud.r-project.org/package=ximage" class="external-link">View on CRAN</a></li>
 <li><a href="https://github.com/hypertidy/ximage/" class="external-link">Browse source code</a></li>
 <li><a href="https://github.com/hypertidy/ximage/issues" class="external-link">Report a bug</a></li>
 <li><a href="https://github.com/hypertidy" class="external-link">hypertidy on GitHub</a></li>
