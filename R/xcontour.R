@@ -24,6 +24,15 @@ xcontour <- function(x, extent = NULL, ..., add = FALSE) {
 }
 #' @export
 xcontour.default <- function(x, extent = NULL, ..., add = FALSE) {
+  if (is.numeric(x) && is.null(dim(x)) && "gis" %in% names(attributes(x))) {
+    ## vector output from gdalraster, first band
+    gis <- attr(x, "gis")
+    if (is.null(extent)) extent <- gis$bbox[c(1, 3, 2, 4)]
+    x <- matrix(x[seq_len(prod(gis$dim[1:2]))], gis$dim[2L], byrow = TRUE)
+  }
+  if (is.null(dim(x)) || length(dim(x)) < 2L) {
+    stop("'x' must be a matrix")
+  }
   ## default extent is the index space of the input, before reorientation
   if (is.null(extent)) extent <- c(0, ncol(x), 0, nrow(x))
   x <- t(x[nrow(x):1, ])
@@ -42,39 +51,34 @@ xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
     ximage_sf_data(x, extent = extent,  add = add, ...)
     return(invisible(x))
   }
-   ## here validate that we have extent, dimension as attributes, otherwise just see if it's a matrix
+  ## validate that we have extent, dimension as attributes
   attrs <- attributes(x)
+  if ("gis" %in% names(attrs)) {
+    ## gdalraster output
+    attrs <- attrs[["gis"]]
+    attrs$dimension <- attrs$dim
+    attrs$extent <- attrs$bbox[c(1, 3, 2, 4)]
+  }
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
-  dimension <- NULL
-  if (!is.null(attrs$dimension)) {
-    dimension <- attrs$dimension
-
+  dimension <- attrs$dimension
+  ## a dimension attribute (vapour, gdalraster gis) means the elements hold
+  ## GDAL row-major data; with no dimension attribute a matrix element is
+  ## taken to be an already-oriented R matrix (same rule as ximage.list)
+  row_major <- !is.null(dimension)
+  if (is.null(dimension) &&
+      (is.null(dim(x[[1L]])) || length(dim(x[[1L]])) < 2L)) {
+    stop("no dimension known")
   }
-  projection <- NULL
-
-  if (is.null(dimension)) {
-    dm1 <- dim(x[[1L]])
-    if (!is.null(dm1) && length(dm1) >= 2L) {
-      ## element is a matrix, convert (nrow, ncol) to (ncol, nrow) convention
-      dimension <- dm1[2:1]
-    } else {
-      stop("no dimension known")
-    }
-  }
- if (!is.null(attrs$projection)) projection <- attrs$projection
-  if (is.character(x[[1]])) {
-    if (grepl("^#", stats::na.omit(x[[1]])[1])) {
-      ## we have image data
-    } else {
-      ## can't read data in ximage
-      stop("can't read data in the this package")
-#      x[[1]] <- as.vector(t(elevation(source = x[[1]], extent = attr(x, "extent"), dimension = attr(x, "dimension"), projection = attr(x, "projection"))))
-    }
+  if (is.character(x[[1L]])) {
+    stop("cannot contour colour data")
   }
 
-
-    xcontour(matrix(x[[1]], dimension[2L], byrow = TRUE),
-                   extent = extent,  add = add, ...)
+  m <- if (row_major) {
+    matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
+  } else {
+    x[[1L]]
+  }
+  xcontour(m, extent = extent, add = add, ...)
 
   ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
 

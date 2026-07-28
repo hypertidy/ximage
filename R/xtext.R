@@ -41,6 +41,12 @@ xtext <- function(x, extent = NULL, add = FALSE, cex = NULL, fit = 0.9, ...) {
 #' @export
 xtext.default <- function(x, extent = NULL, add = FALSE, cex = NULL,
                           fit = 0.9, ...) {
+  if (is.numeric(x) && is.null(dim(x)) && "gis" %in% names(attributes(x))) {
+    ## vector output from gdalraster, first band
+    gis <- attr(x, "gis")
+    if (is.null(extent)) extent <- gis$bbox[c(1, 3, 2, 4)]
+    x <- matrix(x[seq_len(prod(gis$dim[1:2]))], gis$dim[2L], byrow = TRUE)
+  }
   dm <- dim(x)
   if (is.null(dm) || length(dm) < 2L) {
     stop("'x' must be a matrix")
@@ -86,7 +92,14 @@ xtext.list <- function(x, extent = NULL, add = FALSE, cex = NULL,
   }
   if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
   dimension <- attrs$dimension
-  if (is.null(dimension)) stop("no dimension known")
-  m <- matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
+  ## same rule as ximage.list: dimension attribute means GDAL row-major
+  ## streams, a bare matrix element is already an oriented R matrix
+  m <- if (!is.null(dimension)) {
+    matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
+  } else if (!is.null(dim(x[[1L]])) && length(dim(x[[1L]])) >= 2L) {
+    x[[1L]]
+  } else {
+    stop("no dimension known")
+  }
   xtext(m, extent = extent, add = add, cex = cex, fit = fit, ...)
 }
