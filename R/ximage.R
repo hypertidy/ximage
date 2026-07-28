@@ -20,6 +20,24 @@
 #' displayed image, following scan lines down the page (see the package
 #' vignette on orientation).
 #'
+#' Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
+#' width/height/depth attributes) are accepted and a dimension is guessed
+#' by integer-division detection of the vector length. The most nearly
+#' square factorization is chosen (preferring landscape, ncol >= nrow) and
+#' the data is assumed to be in raster scanline order, i.e. flat output
+#' from GDAL readers such as `vapour::gdal_raster_data()` or
+#' `gdalraster::read_ds()`, built as `matrix(x, ncol = NC, byrow = TRUE)`;
+#' column-major R data needs `dim(x) <- c(NR, NC)` instead. A message
+#' reports the guess and the candidate factorizations from 1xN through
+#' Nx1, in GDAL dimension order (ncol x nrow, xsize x ysize). Raw
+#' vectors also consider 3-plane (RGB) and 4-plane (RGBA) scanline
+#' pixel-interleaved interpretations; numeric data never gets a plane
+#' interpretation (whole numbers in 0..255 are too common as ordinary
+#' data to imply an image, a much narrower opt-in detection may come
+#' later). For very long vectors (more than
+#' `getOption("ximage.guess_max", 2^24)` elements) the guess stops with
+#' an error unless `force = TRUE`, or set the dimension explicitly.
+#'
 #' Colour mapping via 'col', 'breaks', and 'zlim' applies to single-band
 #' numeric data only. Multi-band (grey/alpha, RGB, RGBA) data is scaled
 #' automatically: values within 0,1 are used as-is, within 0,255 are divided
@@ -43,6 +61,8 @@
 #'   recycled) applied on top of any existing alpha channel; not supported for
 #'   nativeRaster input
 #' @param na.col colour for missing values, default "transparent"
+#' @param force proceed with a guessed dimension for very long bare vectors
+#'   (see Details), default `FALSE`
 #'
 #' @return invisibly, a list with 'x' (the colour data as plotted) and
 #'   'extent' (xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of
@@ -56,6 +76,12 @@
 #' v <- volcano
 #' v[v > 180] <- NA
 #' ximage(v, na.col = "hotpink")
+#'
+#' ## bare vectors in GDAL scanline order get a guessed dimension, with a
+#' ## message listing candidate shapes (ncol x nrow); here the guess 87x61
+#' ## is the mirror of the true 61x87, so pick from the candidates
+#' ximage(as.vector(t(volcano)))
+#' ximage(matrix(as.vector(t(volcano)), ncol = 61, byrow = TRUE))
 ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                    xlab = NULL, ylab = NULL,
                    col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
@@ -148,34 +174,61 @@ ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
   invisible(out)
 }
 
+#' @rdname ximage
 #' @export
 ximage.raw <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                        xlab = NULL, ylab = NULL,
                        col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                       alpha = NULL, na.col = "transparent") {
+                       alpha = NULL, na.col = "transparent", force = FALSE) {
   x <- .unpack_whd(x)
+  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
+    x <- .ximage_guess(x, force = force)
+  }
   ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
                  alpha = alpha, na.col = na.col)
 }
 
+#' @rdname ximage
 #' @export
 ximage.numeric <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                            xlab = NULL, ylab = NULL,
                            col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent") {
+                           alpha = NULL, na.col = "transparent", force = FALSE) {
   x <- .unpack_whd(x)
+  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
+    x <- .ximage_guess(x, force = force)
+  }
   ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
                  alpha = alpha, na.col = na.col)
 }
 
+#' @rdname ximage
 #' @export
 ximage.integer <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                            xlab = NULL, ylab = NULL,
                            col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent") {
+                           alpha = NULL, na.col = "transparent", force = FALSE) {
   x <- .unpack_whd(x)
+  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
+    x <- .ximage_guess(x, force = force)
+  }
+  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
+                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
+                 alpha = alpha, na.col = na.col)
+}
+
+#' @rdname ximage
+#' @export
+ximage.character <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
+                             xlab = NULL, ylab = NULL,
+                             col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
+                             alpha = NULL, na.col = "transparent", force = FALSE) {
+  ## a bare character vector of colours (hex or named)
+  if (is.null(dim(x))) {
+    x <- .ximage_guess(x, force = force)
+  }
   ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
                  alpha = alpha, na.col = na.col)
@@ -196,7 +249,7 @@ ximage.integer <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                            xlab = NULL, ylab = NULL,
                            col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent") {
+                           alpha = NULL, na.col = "transparent", force = FALSE) {
 
   if (is.list(x)) {
     out <- ximage.list(x, extent = extent, zlim = zlim, add = add, ...,
@@ -214,6 +267,13 @@ ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                        xlab = xlab, ylab = ylab, col = col, breaks = breaks,
                        alpha = alpha, na.col = na.col)
     return(invisible(out))
+  }
+
+  ## safety net for atomic vectors that dispatch straight here (logical,
+  ## or classed vectors), same guess path as the explicit vector methods
+  if (!is.null(x) && is.atomic(x) && is.null(dim(x))) {
+    x <- .unpack_whd(x)
+    if (is.null(dim(x))) x <- .ximage_guess(x, force = force)
   }
 
   stopifnot(is.array(x) || is.matrix(x))

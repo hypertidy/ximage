@@ -1,13 +1,14 @@
 Package: ximage
 Title: Draw Images of Raster Data and Related Adornments
-Version: 0.1.0
+Version: 0.1.0.9001
 Authors@R: 
     c(person("Michael D.", "Sumner", , "mdsumner@gmail.com", role = c("aut", "cre", "cph")), 
       person("Chris", "Toney", role = "ctb"))
 Description: Draw images easily, set up a plot with an image, specify where that image should be placed. Image plot by default
  reflects the index of the image data itself, or can be specified in simple extent terms 
- 'xmin,xmax,ymin,ymax'. Numeric matrices, integer arrays, byte arrays, character arrays, and
- native rasters are (or will be) supported. A combination of image() and rasterImage() from
+ 'xmin,xmax,ymin,ymax'. Numeric matrices, integer arrays, byte arrays, character arrays,
+ and native rasters are supported. Flat vectors are supported in a limited sense with a heuristic
+ to guess at the likely dimensionality and some helpers. A combination of image() and rasterImage() from
  the 'graphics' package with their good features in one place.  
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -24,5 +25,5 @@ Suggests:
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.0.0
-URL: https://github.com/hypertidy/ximage
+URL: https://github.com/hypertidy/ximage, https://hypertidy.github.io/ximage
 BugReports: https://github.com/hypertidy/ximage/issues

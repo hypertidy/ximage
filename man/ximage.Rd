@@ -2,6 +2,10 @@
 % Please edit documentation in R/ximage.R
 \name{ximage}
 \alias{ximage}
+\alias{ximage.raw}
+\alias{ximage.numeric}
+\alias{ximage.integer}
+\alias{ximage.character}
 \title{Plot an image}
 \usage{
 ximage(
@@ -16,6 +20,66 @@ ximage(
   breaks = NULL,
   alpha = NULL,
   na.col = "transparent"
+)
+
+\method{ximage}{raw}(
+  x,
+  extent = NULL,
+  zlim = NULL,
+  add = FALSE,
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  col = hcl.colors(96, "YlOrRd", rev = TRUE),
+  breaks = NULL,
+  alpha = NULL,
+  na.col = "transparent",
+  force = FALSE
+)
+
+\method{ximage}{numeric}(
+  x,
+  extent = NULL,
+  zlim = NULL,
+  add = FALSE,
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  col = hcl.colors(96, "YlOrRd", rev = TRUE),
+  breaks = NULL,
+  alpha = NULL,
+  na.col = "transparent",
+  force = FALSE
+)
+
+\method{ximage}{integer}(
+  x,
+  extent = NULL,
+  zlim = NULL,
+  add = FALSE,
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  col = hcl.colors(96, "YlOrRd", rev = TRUE),
+  breaks = NULL,
+  alpha = NULL,
+  na.col = "transparent",
+  force = FALSE
+)
+
+\method{ximage}{character}(
+  x,
+  extent = NULL,
+  zlim = NULL,
+  add = FALSE,
+  ...,
+  xlab = NULL,
+  ylab = NULL,
+  col = hcl.colors(96, "YlOrRd", rev = TRUE),
+  breaks = NULL,
+  alpha = NULL,
+  na.col = "transparent",
+  force = FALSE
 )
 }
 \arguments{
@@ -46,6 +110,9 @@ recycled) applied on top of any existing alpha channel; not supported for
 nativeRaster input}
 
 \item{na.col}{colour for missing values, default "transparent"}
+
+\item{force}{proceed with a guessed dimension for very long bare vectors
+(see Details), default \code{FALSE}}
 }
 \value{
 invisibly, a list with 'x' (the colour data as plotted) and
@@ -74,6 +141,24 @@ Data orientation is "raster order", the first cell is the top-left of the
 displayed image, following scan lines down the page (see the package
 vignette on orientation).
 
+Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
+width/height/depth attributes) are accepted and a dimension is guessed
+by integer-division detection of the vector length. The most nearly
+square factorization is chosen (preferring landscape, ncol >= nrow) and
+the data is assumed to be in raster scanline order, i.e. flat output
+from GDAL readers such as \code{vapour::gdal_raster_data()} or
+\code{gdalraster::read_ds()}, built as \code{matrix(x, ncol = NC, byrow = TRUE)};
+column-major R data needs \code{dim(x) <- c(NR, NC)} instead. A message
+reports the guess and the candidate factorizations from 1xN through
+Nx1, in GDAL dimension order (ncol x nrow, xsize x ysize). Raw
+vectors also consider 3-plane (RGB) and 4-plane (RGBA) scanline
+pixel-interleaved interpretations; numeric data never gets a plane
+interpretation (whole numbers in 0..255 are too common as ordinary
+data to imply an image, a much narrower opt-in detection may come
+later). For very long vectors (more than
+\code{getOption("ximage.guess_max", 2^24)} elements) the guess stops with
+an error unless \code{force = TRUE}, or set the dimension explicitly.
+
 Colour mapping via 'col', 'breaks', and 'zlim' applies to single-band
 numeric data only. Multi-band (grey/alpha, RGB, RGBA) data is scaled
 automatically: values within 0,1 are used as-is, within 0,255 are divided
@@ -86,4 +171,10 @@ ximage(as.raster(matrix(0:1, 49, 56)))
 v <- volcano
 v[v > 180] <- NA
 ximage(v, na.col = "hotpink")
+
+## bare vectors in GDAL scanline order get a guessed dimension, with a
+## message listing candidate shapes (ncol x nrow); here the guess 87x61
+## is the mirror of the true 61x87, so pick from the candidates
+ximage(as.vector(t(volcano)))
+ximage(matrix(as.vector(t(volcano)), ncol = 61, byrow = TRUE))
 }

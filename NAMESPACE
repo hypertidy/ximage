@@ -2,6 +2,7 @@
 
 S3method(xcontour,default)
 S3method(xcontour,list)
+S3method(ximage,character)
 S3method(ximage,default)
 S3method(ximage,integer)
 S3method(ximage,list)

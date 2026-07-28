@@ -48,7 +48,10 @@ articles:
 - title: Concepts
   navbar: ~
   contents:
+  - why-ximage
   - orientation
+  - articles/dynamic-drawing
+
 
 news:
   releases:

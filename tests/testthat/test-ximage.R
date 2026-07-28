@@ -121,12 +121,14 @@ test_that("raster class input tolerates NA colours", {
 })
 
 test_that("all methods match the generic signature", {
+  ## methods must lead with the generic's arguments in order, and may add
+  ## method-specific arguments after them (e.g. 'force' for bare vectors)
   gen <- names(formals(ximage))
   meths <- c("ximage.default", "ximage.list", "ximage.numeric",
-             "ximage.integer", "ximage.raw", "ximage.nativeRaster",
-             "ximage.raster")
+             "ximage.integer", "ximage.raw", "ximage.character",
+             "ximage.nativeRaster", "ximage.raster")
   for (f in meths) {
-    expect_identical(names(formals(getFromNamespace(f, "ximage"))), gen,
-                     info = f)
+    fmls <- names(formals(getFromNamespace(f, "ximage")))
+    expect_identical(fmls[seq_along(gen)], gen, info = f)
   }
 })

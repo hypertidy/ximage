@@ -1,0 +1,181 @@
+---
+title: "Why ximage"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Why ximage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 5
+)
+```
+
+```{r setup}
+library(ximage)
+```
+
+## Two functions, and the gap between them
+
+Base R has two ways to draw a grid of pixels, and neither one does the
+whole job.
+
+`image()` will map data to colours, but that is where the good news
+ends. It cannot handle RGB imagery at all: three channels of colour have
+to be heroically de-mapped into a single index plus a constructed
+palette before `image()` will touch them. It builds a polygon per cell,
+which grinds on grids of any real size. And its `list(x, y, z)` input
+convention, with cell-centre coordinate vectors, is bookkeeping that has
+nothing to do with the picture.
+
+`rasterImage()` draws colours to the device fast, top-left first, and
+has done since 2010. But it *only* takes colours, never data values. It
+cannot initiate a plot, something must already have set up a window. It
+wants corner coordinates rather than an extent. And it shares no input
+structure with `image()`, so there is no smooth path from one to the
+other.
+
+So the mapping function cannot draw properly and the drawing function
+cannot map, and moving between them means restructuring everything. Then
+the icing on the cake: the two disagree about orientation. `image()`
+treats a matrix as a field z(x, y), first dimension along x, y
+increasing upwards, so the picture is your matrix transposed and flipped
+relative to how it prints. `rasterImage()` reads top-left first like
+every image format, scanning sensor, and spatial data reader in
+existence. This difference is **really confusing**, and it ambushes
+everyone eventually.
+
+```{r image-flip}
+m <- matrix(as.double(1:12), 3, byrow = TRUE)
+m
+op <- par(mfrow = c(2, 1), mar = c(2, 2, 2, 1))
+image(m, main = "image(): transposed and flipped")
+ximage(m, main = "ximage(): what you printed is what you see")
+xtext(m, add = TRUE, cex = 2)
+par(op)
+```
+
+## ximage is the missing middle
+
+ximage does the whole job: it maps values to colours when you give it
+data (or passes colours straight through when you already have them,
+including RGB arrays and nativeRaster), it initiates the plot itself
+from an extent, and it hands the result to `rasterImage()` in one
+consistent raster-order convention. That gap between the two base
+functions is the motivation for the package, and closing it is
+essentially all ximage does.
+
+```{r volcano}
+ximage(volcano, extent = c(0, 610, 0, 870))
+```
+
+Note: `volcano` as stored is not Maungawhau's real orientation in "north-up" geography, its orientation as a visually striking example for `image()` was established in R's earliest days: see [github volcano package](https://github.com/mdsumner/volcano) for the georeferenced truth.
+
+## Data that already knows its shape
+
+Output from GDAL readers plugs straight in, because those readers report
+dimension and extent alongside a flat vector of values in scanline order.
+Both the vapour list format and the gdalraster 'gis' attribute format are
+understood.
+
+```r
+d <- vapour::gdal_raster_data(sds::gebco(), target_dim = c(205, 101))
+ximage(d[[1]])   ## a correctly oriented map of the world
+```
+
+## Data that doesn't: the dimension guess
+
+A bare vector with no attributes is accepted too, and ximage guesses a
+shape by integer-division detection of the length, preferring the most
+nearly square factorization and landscape over portrait (in the absence
+of information, images are mostly wider than tall). The data is assumed
+to be in raster scanline order, exactly the flat output of a GDAL read,
+and the message reports the candidate shapes in GDAL dimension order
+(ncol x nrow) so you can correct a wrong guess by picking a neighbour
+from the list.
+
+```{r guess}
+ximage(as.double(1:12))
+xtext(matrix(as.double(1:12), 3, byrow = TRUE), add = TRUE, cex = 2)
+```
+
+The guess is deliberately conservative: numeric data is always treated as
+one plane of values. Only raw vectors are considered for 3-plane (RGB)
+and 4-plane (RGBA) pixel-interleaved interpretations, because raw
+genuinely is byte data and byte image buffers are overwhelmingly stored
+that way.
+
+## Where this points: nativeRaster
+
+The fastest representation of a colour image in R is not a matrix of hex
+strings and not a 3-way array of doubles, it is `nativeRaster`: one
+packed integer per pixel, each int holding the R, G, B, A bytes, in
+raster order. That is the layout `rasterImage()` consumes natively with
+no conversion at all, and ximage passes it straight through.
+
+```{r nativeraster}
+## a small RGBA image as raw bytes, scanline pixel-interleaved
+nc <- 12; nr <- 8
+px <- as.raw(c(rbind(seq(0, 255, length.out = nc * nr),   ## R ramp
+                     rev(seq(0, 255, length.out = nc * nr)), ## G ramp
+                     127,                                   ## B constant
+                     255)))                                 ## opaque
+## those bytes reinterpret directly as nativeRaster, zero restructuring
+nn <- readBin(px, "integer", n = length(px) %/% 4L)
+dim(nn) <- c(nr, nc)
+class(nn) <- "nativeRaster"
+ximage(nn)
+```
+
+Notice there is no unpacking step: pixel-interleaved RGBA bytes in
+scanline order *are* nativeRaster memory, read four bytes at a time. This
+is why the raw plane guess is the one clever case ximage keeps, and why a
+3-way array of doubles is usually the wrong destination for colour data
+even when it is a correct one. If you are producing colour imagery in R,
+produce nativeRaster and everything downstream gets faster.
+
+## Neighbours: png, nara, farver
+
+nativeRaster appears in surprisingly few places across R, and the
+packages that do take it seriously each occupy a different corner. The
+format itself comes from grDevices (introduced alongside `rasterImage()`
+in R 2.11, 2010) but for years the main way to encounter one was
+`png::readPNG(native = TRUE)`, and I/O is still the png/jpeg/fastpng
+corner: nativeRaster as the thing a decoder hands you and an encoder
+accepts, with fastpng adding the width/height/depth attributed raw
+vectors that ximage also understands.
+
+coolbutuseless/nara treats nativeRaster as a *canvas*: a mutable
+framebuffer of packed ints, drawn on in-place at C speed with points,
+lines, polygons, blitting and sprite operations, aimed at realtime
+rendering and games. It converts to and from arrays and rasters but its
+heart is imperative drawing, and it delegates both I/O and display (the
+same `grid.raster()`/`rasterImage()` fast path ximage uses).
+
+farver owns the colour math: vectorized colour space conversion and
+encoding without ever touching a string, and `encode_native()` /
+`decode_native()` map directly between colour values and the packed
+integer format. It is the industrial-strength version of ximage's one
+choke point, and if ximage ever took a dependency, farver at `to_hex()`
+would be the one worth taking.
+
+ximage's corner is the remaining one: *data* display. Not drawing shapes,
+not colour science, not I/O, but the orientation and extent bookkeeping
+that connects scientific arrays and flat GDAL reads to `rasterImage()`.
+All four packages share the same underlying conviction, that raster
+order plus packed pixels plus `rasterImage()` is the fast path R has had
+all along, and each takes a different seat around it.
+
+## The shape of the package
+
+ximage follows the hypertidy pattern: a thin wrapper over a fast
+primitive, no dependencies beyond base R, and conventions borrowed from
+the data formats rather than invented. Everything reduces to one choke
+point (values to colours) and one call (`rasterImage()`). The rest is
+orientation bookkeeping, which is exactly the part worth getting right
+once so nobody has to think about it again.

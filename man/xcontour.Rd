@@ -26,6 +26,8 @@ break than colour (if not, colours are interpolated to fit)}
 recycled) applied on top of any existing alpha channel; not supported for
 nativeRaster input}
     \item{\code{na.col}}{colour for missing values, default "transparent"}
+    \item{\code{force}}{proceed with a guessed dimension for very long bare vectors
+(see Details), default \code{FALSE}}
   }}
 
 \item{add}{add to plot, or start afresh}
