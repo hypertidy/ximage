@@ -82,6 +82,7 @@
 <li>numeric array (including RGB/A, and grey/alpha)</li>
 <li>nativeRaster</li>
 <li>data returned from <code>vapour::gdal_raster_()</code> or <code>gdalraster::read_ds()</code> functions which include numeric, character, byte vectors or nativeRaster types</li>
+<li>flat vector data - a hueristic is applied to make a guess, with alternatives to consider - helpful for recovering from missing metadata</li>
 </ul>
 <p>Missing values display as a colour of your choosing (<code>na.col</code>, transparent by default), a constant <code>alpha</code> can be applied over any input for overlay work, and <code>zlim</code> anchors absolute colours across multiple plots.</p>
 <p>Alongside <code><a href="reference/ximage.html">ximage()</a></code> there are matching adornment functions that share its layout conventions: <code><a href="reference/xcontour.html">xcontour()</a></code> (contours at cell centres), <code><a href="reference/xtext.html">xtext()</a></code> (cell values as labels), and <code><a href="reference/xrect.html">xrect()</a></code> (rectangles from extents).</p>
@@ -141,7 +142,7 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/system.time.html" class="external-link">system.time</a></span><span class="op">(</span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">im</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-imagery-1.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.004   0.000   0.004</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.001   0.002   0.003</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="do">## crank up the size it's still fast</span></span>
@@ -151,7 +152,16 @@
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">ximage</span>(im, <span class="at">asp =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="reference/figures/README-imagery-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.042   0.048   0.090</span></span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.047   0.019   0.066</span></span></code></pre></div>
+<p>We can call on other packages to provide input, such as <code>extent_from_cell</code> in vaster:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">## let's make up a new tiling over our image</span></span>
+<span><span class="va">px0</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">15</span><span class="op">)</span></span>
+<span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/do.call.html" class="external-link">do.call</a></span><span class="op">(</span><span class="va">rbind</span>, <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="va">px0</span><span class="op">)</span>, <span class="fl">17</span><span class="op">)</span>, \<span class="op">(</span><span class="va">.x</span><span class="op">)</span> <span class="fu">vaster</span><span class="fu">::</span><span class="fu">extent_from_cell</span><span class="op">(</span><span class="va">px0</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span>, <span class="op">-</span><span class="fl">1</span>, <span class="fl">1</span><span class="op">)</span> <span class="op">*</span> <span class="fl">3e5</span>,</span>
+<span>                                                                  <span class="va">.x</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">im</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/xrect.html">xrect</a></span><span class="op">(</span><span class="va">ex</span>, border <span class="op">=</span> <span class="st">"white"</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-rect1-1.png" alt="" width="100%"></p>
 </div>
 <div class="section level2">
 <h2 id="code-of-conduct">Code of Conduct<a class="anchor" aria-label="anchor" href="#code-of-conduct"></a>

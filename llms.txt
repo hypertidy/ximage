@@ -12,6 +12,9 @@ ximage supports making images from
 - data returned from `vapour::gdal_raster_()` or `gdalraster::read_ds()`
   functions which include numeric, character, byte vectors or
   nativeRaster types
+- flat vector data - a hueristic is applied to make a guess, with
+  alternatives to consider - helpful for recovering from missing
+  metadata
 
 Missing values display as a colour of your choosing (`na.col`,
 transparent by default), a constant `alpha` can be applied over any
@@ -128,7 +131,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.004   0.000   0.004
+#>   0.001   0.002   0.003
 
 
 ## crank up the size it's still fast
@@ -142,8 +145,23 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.042   0.048   0.090
+#>   0.047   0.019   0.066
 ```
+
+We can call on other packages to provide input, such as
+`extent_from_cell` in vaster:
+
+``` r
+
+## let's make up a new tiling over our image
+px0 <- c(10, 15)
+ex <- do.call(rbind, lapply(sample(prod(px0), 17), \(.x) vaster::extent_from_cell(px0, c(-1, 1, -1, 1) * 3e5,
+                                                                  .x)))
+ximage(im, asp = 1)
+xrect(ex, border = "white", add = TRUE)
+```
+
+![](reference/figures/README-rect1-1.png)
 
 ## Code of Conduct
 
