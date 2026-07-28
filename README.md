@@ -122,7 +122,7 @@ system.time(ximage(im, asp = 1))
 <img src="man/figures/README-imagery-1.png" alt="" width="100%" />
 
     #>    user  system elapsed 
-    #>   0.003   0.000   0.003
+    #>   0.004   0.000   0.004
 
 
     ## crank up the size it's still fast
@@ -134,7 +134,7 @@ system.time(ximage(im, asp = 1))
 <img src="man/figures/README-imagery-2.png" alt="" width="100%" />
 
     #>    user  system elapsed 
-    #>   0.050   0.015   0.066
+    #>   0.042   0.048   0.090
 
 ## Code of Conduct
 
