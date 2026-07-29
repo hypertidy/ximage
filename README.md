@@ -8,7 +8,7 @@
 [![R-CMD-check](https://github.com/hypertidy/ximage/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/hypertidy/ximage/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with
+The goal of ximage is to be like `image()` and `rasterImage()` but with
 the missing functionality and usability problems fixed. Draw an image
 where you want it easily
 
@@ -125,7 +125,7 @@ system.time(ximage(im, asp = 1))
 <img src="man/figures/README-imagery-1.png" alt="" width="100%" />
 
     #>    user  system elapsed 
-    #>   0.001   0.002   0.003
+    #>   0.003   0.000   0.003
 
 
     ## crank up the size it's still fast
@@ -137,7 +137,7 @@ system.time(ximage(im, asp = 1))
 <img src="man/figures/README-imagery-2.png" alt="" width="100%" />
 
     #>    user  system elapsed 
-    #>   0.047   0.019   0.066
+    #>   0.046   0.032   0.078
 
 We can call on other packages to provide input, such as
 `extent_from_cell` in vaster:
