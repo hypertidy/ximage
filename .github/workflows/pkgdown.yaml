@@ -14,7 +14,7 @@ name: pkgdown
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-  
+
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
@@ -40,6 +40,9 @@ jobs:
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
         shell: Rscript {0}
+
+      - name: Sweep fallback links
+        run: Rscript tools/sweep-links.R docs
 
       - name: Deploy to GitHub pages 🚀
         if: github.event_name != 'pull_request'
