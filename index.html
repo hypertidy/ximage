@@ -75,7 +75,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with the missing functionality and usability problems fixed. Draw an image where you want it easily</p>
+<p>The goal of ximage is to be like <code>image()</code> and <code>rasterImage()</code> but with the missing functionality and usability problems fixed. Draw an image where you want it easily</p>
 <p>ximage supports making images from</p>
 <ul>
 <li>numeric, character, byte matrix</li>
@@ -142,7 +142,7 @@
 <span><span class="fu">system.time</span><span class="op">(</span><span class="fu"><a href="reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">im</span>, asp <span class="op">=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-imagery-1.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.001   0.002   0.003</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a><span class="co">#&gt;   0.003   0.000   0.003</span></span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a></span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="do">## crank up the size it's still fast</span></span>
@@ -152,7 +152,7 @@
 <span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="fu">system.time</span>(<span class="fu">ximage</span>(im, <span class="at">asp =</span> <span class="dv">1</span>))</span></code></pre></div>
 <p><img src="reference/figures/README-imagery-2.png" alt="" width="100%"></p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="co">#&gt;    user  system elapsed </span></span>
-<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.047   0.019   0.066</span></span></code></pre></div>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt;   0.046   0.032   0.078</span></span></code></pre></div>
 <p>We can call on other packages to provide input, such as <code>extent_from_cell</code> in vaster:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## let's make up a new tiling over our image</span></span>

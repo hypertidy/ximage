@@ -1,6 +1,8 @@
 # ximage
 
-The goal of ximage is to be like ‘image()’ and ‘rasterImage()’ but with
+The goal of ximage is to be like
+[`image()`](https://rdrr.io/r/graphics/image.html) and
+[`rasterImage()`](https://rdrr.io/r/graphics/rasterImage.html) but with
 the missing functionality and usability problems fixed. Draw an image
 where you want it easily
 
@@ -131,7 +133,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.001   0.002   0.003
+#>   0.003   0.000   0.003
 
 
 ## crank up the size it's still fast
@@ -145,7 +147,7 @@ system.time(ximage(im, asp = 1))
 
 ``` R
 #>    user  system elapsed 
-#>   0.047   0.019   0.066
+#>   0.046   0.032   0.078
 ```
 
 We can call on other packages to provide input, such as
