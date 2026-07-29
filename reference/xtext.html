@@ -96,7 +96,7 @@ left to right down the page ("raster order").</p>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>arguments passed to <code><a href="https://rdrr.io/r/graphics/text.html" class="external-link">text()</a></code>, for example 'col'</p></dd>
+<dd><p>arguments passed to <code>text()</code>, for example 'col'</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -108,22 +108,22 @@ left to right down the page ("raster order").</p>
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>Text size is chosen automatically to fit the largest label within a cell,
 scaled by 'fit' (use 'cex' to override). Labels that are NA are not drawn.</p>
-<p>Input may be a matrix (values are used as labels via <code><a href="https://rdrr.io/r/base/format.html" class="external-link">format()</a></code>), or a
+<p>Input may be a matrix (values are used as labels via <code>format()</code>), or a
 list in the style of vapour or gdalraster reader output (a row-major
 vector with 'dimension'/'extent' attributes, or a 'gis' attribute).</p>
     </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">matrix</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="ximage.html">ximage</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">xtext</span><span class="op">(</span><span class="va">m</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="xtext-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## the label positions are cell centres in the extent</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="ximage.html">ximage</a></span><span class="op">(</span><span class="va">volcano</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">xtext</span><span class="op">(</span><span class="va">volcano</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">87</span>, by <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">61</span>, by <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>      extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="ximage.html">ximage</a></span><span class="op">(</span><span class="va">volcano</span>, extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">xtext</span><span class="op">(</span><span class="va">volcano</span><span class="op">[</span><span class="fu">seq</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">87</span>, by <span class="op">=</span> <span class="fl">8</span><span class="op">)</span>, <span class="fu">seq</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">61</span>, by <span class="op">=</span> <span class="fl">6</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>      extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, col <span class="op">=</span> <span class="st">"white"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="xtext-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>

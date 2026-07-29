@@ -84,50 +84,50 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw">library</span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="two-functions-and-the-gap-between-them">Two functions, and the gap between them<a class="anchor" aria-label="anchor" href="#two-functions-and-the-gap-between-them"></a>
 </h2>
 <p>Base R has two ways to draw a grid of pixels, and neither one does
 the whole job.</p>
-<p><code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> will map data to colours, but that is where the
+<p><code>image()</code> will map data to colours, but that is where the
 good news ends. It cannot handle RGB imagery at all: three channels of
 colour have to be converted to a constructed palette before
-<code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code>, the <code>list(x, y, z)</code> input convention
+<code>image()</code>, the <code>list(x, y, z)</code> input convention
 with cell-centre coordinate vectors (or cell-edge vectors) is 1990s
 legacy that is hard to use, and the default placement of a matrix in the
 unit square gives no easy reference to the size or shape of the data
 even with aspect ratio set to 1.</p>
-<p><code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> draws colours to the device fast, top-left
+<p><code>rasterImage()</code> draws colours to the device fast, top-left
 first, and has done since 2010. But it <em>only</em> takes colours or
 R’s native raster or data values within 0,1. It cannot initiate a plot,
 something must already have set up a window. It wants separate scalar
 parameters for xmin, ymin, xmax, ymax (in that order), and it shares no
-input structure with <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code>, so there is no smooth path
+input structure with <code>image()</code>, so there is no smooth path
 from one to the other.</p>
 <p>The mapping function cannot draw properly and the drawing function
 cannot map, and moving between them means fighting with the plumbing.
-They also disagree about orientation: <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> treats a
+They also disagree about orientation: <code>image()</code> treats a
 matrix as a field z(x, y), first dimension along x, y increasing
 upwards, so the picture is your matrix transposed and flipped relative
-to how it prints. <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> reads top-left first like
+to how it prints. <code>rasterImage()</code> reads top-left first like
 most image formats, scanning sensor, spatial data readers, and western
 writing. This difference is <strong>really confusing</strong>, and feels
 like it was just unfinished.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">matrix</span><span class="op">(</span><span class="fu">as.double</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">m</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
 <span><span class="co">#&gt; [1,]    1    2    3    4</span></span>
 <span><span class="co">#&gt; [2,]    5    6    7    8</span></span>
 <span><span class="co">#&gt; [3,]    9   10   11   12</span></span>
-<span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"image(): transposed and flipped"</span><span class="op">)</span></span>
+<span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu">par</span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span>, mar <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">2</span>, <span class="fl">1</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">image</span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"image(): transposed and flipped"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"ximage(): what you printed is what you see"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="va">m</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="why-ximage_files/figure-html/image-flip-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">par</span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="ximage-is-a-start-on-the-finish">ximage is a start on the finish<a class="anchor" aria-label="anchor" href="#ximage-is-a-start-on-the-finish"></a>
@@ -136,15 +136,15 @@ like it was just unfinished.</p>
 colours when you give it data (or passes colours straight through when
 you already have them, including RGB arrays and nativeRaster), it
 initiates the plot itself from an extent, and it hands the result to
-<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> in one consistent raster-order convention.
+<code>rasterImage()</code> in one consistent raster-order convention.
 That gap between the two base functions is the motivation for the
 package, and closing it is essentially all ximage does.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">volcano</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">610</span>, <span class="fl">0</span>, <span class="fl">870</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">volcano</span>, extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">610</span>, <span class="fl">0</span>, <span class="fl">870</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p><img src="why-ximage_files/figure-html/volcano-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note: <code>volcano</code> as stored is not Maungawhau’s real
 orientation in “north-up” geography, its orientation as a visually
-striking example for <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> was established in R’s
+striking example for <code>image()</code> was established in R’s
 earliest days: see <a href="https://github.com/mdsumner/volcano" class="external-link">github
 volcano package</a> for the georeferenced truth.</p>
 </div>
@@ -157,7 +157,7 @@ the data itself: x measured in columns, y in rows, cell edges on whole
 numbers. This is the pixel coordinate system of imagery, the space a
 geotransform maps to the world, so the default means “no georeferencing
 yet” rather than no meaning at all.</p>
-<p>Compare the unit square of <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code>, which maps every
+<p>Compare the unit square of <code>image()</code>, which maps every
 matrix to (0, 1) x (0, 1) regardless of what it is. An R plot fills the
 device by default, its aspect ratio is dynamic, and that is fine on its
 own, but a unit square on top of it leaves the data in an entirely
@@ -184,7 +184,7 @@ report dimension and extent alongside a flat vector of values in
 scanline order. Both the vapour list format and the gdalraster ‘gis’
 attribute format are understood.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu">vapour</span><span class="fu">::</span><span class="fu">gdal_raster_data</span><span class="op">(</span><span class="fu">sds</span><span class="fu">::</span><span class="fu">gebco</span><span class="op">(</span><span class="op">)</span>, target_dim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">205</span>, <span class="fl">101</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu">vapour</span><span class="fu">::</span><span class="fu">gdal_raster_data</span><span class="op">(</span><span class="fu">sds</span><span class="fu">::</span><span class="fu">gebco</span><span class="op">(</span><span class="op">)</span>, target_dim <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">205</span>, <span class="fl">101</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">d</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>   <span class="co">## a correctly oriented map of the world</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -199,11 +199,11 @@ and the message reports the candidate shapes in GDAL dimension order
 (ncol x nrow) so you can correct a wrong guess by picking a neighbour
 from the list.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="fu">as.double</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; guessing dimension for vector of length 12</span></span>
 <span><span class="co">#&gt;   using ncol x nrow = 4 x 3 (GDAL xsize x ysize), as matrix(x, ncol = 4, byrow = TRUE)</span></span>
 <span><span class="co">#&gt;   candidates (ncol x nrow): 1x12, 2x6, 3x4, [4x3], 6x2, 12x1</span></span>
-<span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="fu">matrix</span><span class="op">(</span><span class="fu">as.double</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span><span class="op">)</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span>, cex <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="why-ximage_files/figure-html/guess-1.png" class="r-plt" alt="" width="672"></p>
 <p>The guess is deliberately conservative: numeric data is always
 treated as one plane of values. Only raw vectors are considered for
@@ -218,19 +218,19 @@ overwhelmingly stored that way.</p>
 hex strings and not a 3-way array of doubles, it is
 <code>nativeRaster</code>: one packed integer per pixel, each int
 holding the R, G, B, A bytes, in raster order. That is the layout
-<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> consumes natively with no conversion at all,
+<code>rasterImage()</code> consumes natively with no conversion at all,
 and ximage passes it straight through.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">## a small RGBA image as raw bytes, scanline pixel-interleaved</span></span>
 <span><span class="va">nc</span> <span class="op">&lt;-</span> <span class="fl">12</span>; <span class="va">nr</span> <span class="op">&lt;-</span> <span class="fl">8</span></span>
-<span><span class="va">px</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/raw.html" class="external-link">as.raw</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cbind.html" class="external-link">rbind</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">255</span>, length.out <span class="op">=</span> <span class="va">nc</span> <span class="op">*</span> <span class="va">nr</span><span class="op">)</span>,   <span class="co">## R ramp</span></span>
-<span>                     <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">255</span>, length.out <span class="op">=</span> <span class="va">nc</span> <span class="op">*</span> <span class="va">nr</span><span class="op">)</span><span class="op">)</span>, <span class="co">## G ramp</span></span>
+<span><span class="va">px</span> <span class="op">&lt;-</span> <span class="fu">as.raw</span><span class="op">(</span><span class="fu">c</span><span class="op">(</span><span class="fu">rbind</span><span class="op">(</span><span class="fu">seq</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">255</span>, length.out <span class="op">=</span> <span class="va">nc</span> <span class="op">*</span> <span class="va">nr</span><span class="op">)</span>,   <span class="co">## R ramp</span></span>
+<span>                     <span class="fu">rev</span><span class="op">(</span><span class="fu">seq</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">255</span>, length.out <span class="op">=</span> <span class="va">nc</span> <span class="op">*</span> <span class="va">nr</span><span class="op">)</span><span class="op">)</span>, <span class="co">## G ramp</span></span>
 <span>                     <span class="fl">127</span>,                                   <span class="co">## B constant</span></span>
 <span>                     <span class="fl">255</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>                                 <span class="co">## opaque</span></span>
 <span><span class="co">## those bytes reinterpret directly as nativeRaster, zero restructuring</span></span>
-<span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/readBin.html" class="external-link">readBin</a></span><span class="op">(</span><span class="va">px</span>, <span class="st">"integer"</span>, n <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">px</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%/%</a></span> <span class="fl">4L</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">nr</span>, <span class="va">nc</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"nativeRaster"</span></span>
+<span><span class="va">nn</span> <span class="op">&lt;-</span> <span class="fu">readBin</span><span class="op">(</span><span class="va">px</span>, <span class="st">"integer"</span>, n <span class="op">=</span> <span class="fu">length</span><span class="op">(</span><span class="va">px</span><span class="op">)</span> <span class="op">%/%</span> <span class="fl">4L</span><span class="op">)</span></span>
+<span><span class="fu">dim</span><span class="op">(</span><span class="va">nn</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu">c</span><span class="op">(</span><span class="va">nr</span>, <span class="va">nc</span><span class="op">)</span></span>
+<span><span class="fu">class</span><span class="op">(</span><span class="va">nn</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"nativeRaster"</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">nn</span><span class="op">)</span></span></code></pre></div>
 <p><img src="why-ximage_files/figure-html/nativeraster-1.png" class="r-plt" alt="" width="672"></p>
 <p>Notice there is no unpacking step: pixel-interleaved RGBA bytes in
@@ -246,7 +246,7 @@ faster.</p>
 </h2>
 <p>nativeRaster appears in surprisingly few places across R, and there’s
 no integration but also very little overlap. The format itself comes
-from grDevices (introduced alongside <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> in R
+from grDevices (introduced alongside <code>rasterImage()</code> in R
 2.11, 2010) but for years the main way to encounter one was
 <code>png::readPNG(native = TRUE)</code>, and I/O is still the
 png/jpeg/fastpng corner: nativeRaster as the thing a decoder hands you
@@ -264,7 +264,7 @@ between colour values and the packed integer format. It is the
 industrial-strength version of ximage’s <code>to_hex()</code>.</p>
 <p>ximage’s corner is the <em>data</em> display, just the orientation
 and extent bookkeeping that connects scientific arrays and flat GDAL
-reads to <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>.</p>
+reads to <code>rasterImage()</code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

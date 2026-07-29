@@ -84,7 +84,7 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw">library</span><span class="op">(</span><span class="va"><a href="https://github.com/hypertidy/ximage" class="external-link">ximage</a></span><span class="op">)</span></span></code></pre></div>
 <p>ximage draws data in <em>raster order</em>: the first cell of your
 matrix is the top-left of the picture, and each row of the matrix is a
 scan line reading left to right, down the page. This is the order of
@@ -101,7 +101,7 @@ that R asks for dimensions as nrow,ncol while image formats declare them
 as ncol,nrow). The round trip back to the pixel stream is
 <code>as.vector(t(m))</code>, because getting values <em>out</em> of a
 matrix is always column-major - there is no <code>byrow</code> for
-extraction, and none for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code> at all.</p>
+extraction, and none for <code>array()</code> at all.</p>
 <div class="section level2">
 <h2 id="seeing-the-layout">Seeing the layout<a class="anchor" aria-label="anchor" href="#seeing-the-layout"></a>
 </h2>
@@ -109,7 +109,7 @@ extraction, and none for <code><a href="https://rdrr.io/r/base/array.html" class
 each cell, in exactly the layout <code><a href="../reference/ximage.html">ximage()</a></code> uses. A small
 labelled matrix makes the convention self-evident.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="op">(</span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="op">(</span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">matrix</span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, nrow <span class="op">=</span> <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
 <span><span class="co">#&gt; [1,]    1    2    3    4</span></span>
 <span><span class="co">#&gt; [2,]    5    6    7    8</span></span>
@@ -133,29 +133,29 @@ expects it.</p>
 <div class="section level2">
 <h2 id="what-image-does-instead">What image() does instead<a class="anchor" aria-label="anchor" href="#what-image-does-instead"></a>
 </h2>
-<p>Base <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> uses a different convention: the
+<p>Base <code>image()</code> uses a different convention: the
 <em>rows</em> of the matrix map to the x axis and the <em>columns</em>
 to the y axis, with the first column at the bottom. The same matrix:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"image()"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">op</span> <span class="op">&lt;-</span> <span class="fu">par</span><span class="op">(</span>mfrow <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">image</span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"image()"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">m</span>, main <span class="op">=</span> <span class="st">"ximage()"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="orientation_files/figure-html/image-vs-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/par.html" class="external-link">par</a></span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
-<p><code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> has effectively rotated the data 90 degrees
+<code class="sourceCode R"><span><span class="fu">par</span><span class="op">(</span><span class="va">op</span><span class="op">)</span></span></code></pre></div>
+<p><code>image()</code> has effectively rotated the data 90 degrees
 anticlockwise: what you see is the transpose, flipped. The classic
-incantation to make <code><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image()</a></code> show a matrix the way you would
+incantation to make <code>image()</code> show a matrix the way you would
 print it is</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/image.html" class="external-link">image</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">m</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">image</span><span class="op">(</span><span class="fu">t</span><span class="op">(</span><span class="va">m</span><span class="op">[</span><span class="fu">nrow</span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">:</span><span class="fl">1</span>, <span class="op">]</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <p>and forgetting one half of that (or applying it twice) is the source
 of a whole genre of plotting bugs. With ximage the incantation is
 <code>ximage(m)</code>.</p>
-<p><code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>, which ximage uses underneath, already
+<p><code>rasterImage()</code>, which ximage uses underneath, already
 follows raster order. What it lacks is everything else: it cannot start
 a plot, cannot map numeric values through a palette, and cannot handle
-missing values. ximage is raster-order <code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code> with
+missing values. ximage is raster-order <code>rasterImage()</code> with
 those limitations removed.</p>
 </div>
 <div class="section level2">
@@ -166,9 +166,9 @@ order, with the dimensions declared alongside as (ncol, nrow) - x before
 y, the image-format convention. The two conversions are:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">vals</span> <span class="op">&lt;-</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>                <span class="co"># the pixel stream, raster order</span></span>
-<span><span class="va">dimension</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">4L</span>, <span class="fl">3L</span><span class="op">)</span>      <span class="co"># (ncol, nrow), as a reader declares it</span></span>
+<span><span class="va">dimension</span> <span class="op">&lt;-</span> <span class="fu">c</span><span class="op">(</span><span class="fl">4L</span>, <span class="fl">3L</span><span class="op">)</span>      <span class="co"># (ncol, nrow), as a reader declares it</span></span>
 <span></span>
-<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="va">vals</span>, <span class="va">dimension</span><span class="op">[</span><span class="fl">2L</span><span class="op">]</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fu">matrix</span><span class="op">(</span><span class="va">vals</span>, <span class="va">dimension</span><span class="op">[</span><span class="fl">2L</span><span class="op">]</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">m</span></span>
 <span><span class="co">#&gt;      [,1] [,2] [,3] [,4]</span></span>
 <span><span class="co">#&gt; [1,]    1    2    3    4</span></span>
@@ -176,7 +176,7 @@ y, the image-format convention. The two conversions are:</p>
 <span><span class="co">#&gt; [3,]    9   10   11   12</span></span>
 <span></span>
 <span><span class="co">## and back again</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/vector.html" class="external-link">as.vector</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="va">vals</span><span class="op">)</span></span>
+<span><span class="fu">all</span><span class="op">(</span><span class="fu">as.vector</span><span class="op">(</span><span class="fu">t</span><span class="op">(</span><span class="va">m</span><span class="op">)</span><span class="op">)</span> <span class="op">==</span> <span class="va">vals</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p><code><a href="../reference/ximage.html">ximage()</a></code> applies this conversion for you when given
 reader output directly. A list with <code>dimension</code> and
@@ -184,7 +184,7 @@ reader output directly. A list with <code>dimension</code> and
 list with a <code>gis</code> attribute (the gdalraster convention),
 plots correctly with no handling at all:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/structure.html" class="external-link">structure</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">vals</span><span class="op">)</span>, dimension <span class="op">=</span> <span class="va">dimension</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">l</span> <span class="op">&lt;-</span> <span class="fu">structure</span><span class="op">(</span><span class="fu">list</span><span class="op">(</span><span class="va">vals</span><span class="op">)</span>, dimension <span class="op">=</span> <span class="va">dimension</span>, extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">0</span>, <span class="fl">4</span>, <span class="fl">0</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">l</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="va">l</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="orientation_files/figure-html/reader-1.png" class="r-plt" alt="" width="672"></p>
@@ -199,22 +199,22 @@ stream.</p>
 <div class="section level2">
 <h2 id="multi-band-arrays">Multi-band arrays<a class="anchor" aria-label="anchor" href="#multi-band-arrays"></a>
 </h2>
-<p>There is no <code>byrow</code> for <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code>, so a
+<p>There is no <code>byrow</code> for <code>array()</code>, so a
 raster-order stream of RGB bands needs one more step. Band-sequential
 data (all of band 1, then band 2, then band 3, which is what GDAL
 readers return) becomes a display-ready array with:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nbands</span> <span class="op">&lt;-</span> <span class="fl">3L</span></span>
-<span><span class="va">stream</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/prod.html" class="external-link">prod</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span> <span class="op">*</span> <span class="va">nbands</span><span class="op">)</span></span>
+<span><span class="va">stream</span> <span class="op">&lt;-</span> <span class="fu">runif</span><span class="op">(</span><span class="fu">prod</span><span class="op">(</span><span class="va">dimension</span><span class="op">)</span> <span class="op">*</span> <span class="va">nbands</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/aperm.html" class="external-link">aperm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/array.html" class="external-link">array</a></span><span class="op">(</span><span class="va">stream</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">dimension</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="va">nbands</span><span class="op">)</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>  <span class="co">## (nrow, ncol, nbands)</span></span>
+<span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu">aperm</span><span class="op">(</span><span class="fu">array</span><span class="op">(</span><span class="va">stream</span>, <span class="fu">c</span><span class="op">(</span><span class="va">dimension</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span>, <span class="va">nbands</span><span class="op">)</span><span class="op">)</span>, <span class="fu">c</span><span class="op">(</span><span class="fl">2</span>, <span class="fl">1</span>, <span class="fl">3</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu">dim</span><span class="op">(</span><span class="va">a</span><span class="op">)</span>  <span class="co">## (nrow, ncol, nbands)</span></span>
 <span><span class="co">#&gt; [1] 3 4 3</span></span>
 <span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span></span></code></pre></div>
 <p><img src="orientation_files/figure-html/bands-1.png" class="r-plt" alt="" width="672"></p>
-<p>The <code><a href="https://rdrr.io/r/base/array.html" class="external-link">array()</a></code> call shapes each band as (ncol, nrow) -
+<p>The <code>array()</code> call shapes each band as (ncol, nrow) -
 filled column-major, so each <em>column</em> holds a scan line - and the
-<code><a href="https://rdrr.io/r/base/aperm.html" class="external-link">aperm()</a></code> swaps the first two dimensions to give R display
+<code>aperm()</code> swaps the first two dimensions to give R display
 orientation. Again, ximage does this for you when the bands come as a
 reader-output list; the recipe is shown for when you meet a raw
 stream.</p>
@@ -229,13 +229,13 @@ follows the same rule: cell <code>[1, 1]</code> spans x from 0 to 1 and
 y from nrow - 1 to nrow, and its centre - where <code><a href="../reference/xtext.html">xtext()</a></code>
 puts the label - is at (0.5, nrow - 0.5).</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">m</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, <span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="va">m</span>, extent <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, <span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>; <span class="fu"><a href="https://rdrr.io/r/graphics/axis.html" class="external-link">axis</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/abline.html" class="external-link">abline</a></span><span class="op">(</span>v <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, h <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/ximage.html">ximage</a></span><span class="op">(</span><span class="va">m</span>, extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, <span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/xtext.html">xtext</a></span><span class="op">(</span><span class="va">m</span>, extent <span class="op">=</span> <span class="fu">c</span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, <span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span><span class="op">)</span>, add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="fu">axis</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span>; <span class="fu">axis</span><span class="op">(</span><span class="fl">2</span><span class="op">)</span></span>
+<span><span class="fu">abline</span><span class="op">(</span>v <span class="op">=</span> <span class="fu">seq</span><span class="op">(</span><span class="fl">140</span>, <span class="fl">148</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, h <span class="op">=</span> <span class="fu">seq</span><span class="op">(</span><span class="op">-</span><span class="fl">44</span>, <span class="op">-</span><span class="fl">38</span>, by <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>, lty <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
 <p><img src="orientation_files/figure-html/extent-1.png" class="r-plt" alt="" width="672"></p>
 <p>This edge convention is shared by GDAL geotransforms and by
-<code><a href="https://rdrr.io/r/graphics/rasterImage.html" class="external-link">rasterImage()</a></code>, and it is what makes images from different
+<code>rasterImage()</code>, and it is what makes images from different
 sources overlay exactly: an extent is a statement about where the data
 sits, not about where its first sample was taken.
 <code><a href="../reference/xcontour.html">xcontour()</a></code> uses the matching cell-centre positions, so
