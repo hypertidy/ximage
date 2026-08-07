@@ -1,3 +1,10 @@
+# ximage dev
+
+* Removed internal definition `to_hex()` in favour of imported `palr::image_hex()`. 
+
+* ximage now imports palr. 
+
+
 # ximage 0.1.0
 
 * New vignette "Why ximage" frames the package motivation: raster order

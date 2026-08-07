@@ -30,49 +30,11 @@
 ##
 ## Not exported. Keep this file free of any external package calls.
 
+#' @importFrom palr image_hex
 to_hex <- function(x, col = NULL, breaks = NULL, zlim = NULL,
                    alpha = NULL, na.col = "transparent") {
-  if (is.raw(x)) {
-    x <- array(as.integer(x), dim(x))
-  }
-  dm <- dim(x)
-  if (is.null(dm) || length(dm) < 2L) {
-    stop("'x' must be a matrix or an array with 2 or 3 dimensions")
-  }
-  if (length(dm) > 3L) {
-    stop("arrays with more than 3 dimensions are not supported")
-  }
-  if (is.character(x)) {
-    out <- matrix(x, dm[1L], dm[2L])
-    out[is.na(out)] <- na.col
-    return(.apply_alpha(out, alpha, na.col))
-  }
-  if (is.logical(x)) {
-    x <- array(as.integer(x), dm)
-  }
-  if (!is.numeric(x)) {
-    stop("'x' must be numeric, integer, raw, logical, or character")
-  }
-  nbands <- if (length(dm) == 2L) 1L else dm[3L]
+  return(palr::image_hex(x, col = col, breaks = breaks, zlim = zlim, alpha = alpha, na.col = na.col))
 
-  if (nbands == 1L) {
-    if (length(dm) == 3L) x <- x[, , 1L, drop = TRUE]
-    out <- .map_palette(x, col = col, breaks = breaks, zlim = zlim,
-                        na.col = na.col)
-    return(.apply_alpha(out, alpha, na.col))
-  }
-
-  if (!is.null(zlim)) {
-    warning("'zlim' is ignored for multi-band (grey/alpha, RGB, RGBA) input")
-  }
-  if (nbands == 2L) {
-    return(.greya_hex(x, alpha = alpha, na.col = na.col))
-  }
-  if (nbands %in% c(3L, 4L)) {
-    return(.rgb_hex(x, alpha = alpha, na.col = na.col))
-  }
-  stop(sprintf("cannot interpret %i bands as image data (expected 1-4)",
-               nbands))
 }
 
 ## map a numeric matrix to hex colours through a palette
