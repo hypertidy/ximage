@@ -15,14 +15,15 @@ CRAN release: 2026-07-21
   detection of the length, choosing the most nearly square factorization
   (landscape preferred) and assuming raster scanline order, i.e. flat
   output from GDAL readers such as `vapour::gdal_raster_data()` or
-  `gdalraster::read_ds()`, built as `matrix(x, ncol = NC, byrow = TRUE)`
-  (column-major R data needs `dim(x) <- c(NR, NC)` instead). A message
-  reports the guess and the candidate shapes from 1xN through Nx1, in
-  GDAL dimension order (ncol x nrow). Raw vectors also consider 3-plane
-  (RGB) and 4-plane (RGBA) scanline pixel-interleaved interpretations;
-  numeric data never gets a plane interpretation by default. Vectors
-  longer than `getOption("ximage.guess_max", 2^24)` error unless
-  `force = TRUE` or the dimension is set explicitly.
+  [`gdalraster::read_ds()`](https://firelab.github.io/gdalraster/reference/read_ds.html),
+  built as `matrix(x, ncol = NC, byrow = TRUE)` (column-major R data
+  needs `dim(x) <- c(NR, NC)` instead). A message reports the guess and
+  the candidate shapes from 1xN through Nx1, in GDAL dimension order
+  (ncol x nrow). Raw vectors also consider 3-plane (RGB) and 4-plane
+  (RGBA) scanline pixel-interleaved interpretations; numeric data never
+  gets a plane interpretation by default. Vectors longer than
+  `getOption("ximage.guess_max", 2^24)` error unless `force = TRUE` or
+  the dimension is set explicitly.
 
 - New function
   [`xtext()`](https://hypertidy.github.io/ximage/reference/xtext.md)

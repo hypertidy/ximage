@@ -11,12 +11,20 @@ ximage supports making images from
 - numeric, character, byte matrix
 - numeric array (including RGB/A, and grey/alpha)
 - nativeRaster
-- data returned from `vapour::gdal_raster_()` or `gdalraster::read_ds()`
+- data returned from `vapour::gdal_raster_()` or
+  [`gdalraster::read_ds()`](https://firelab.github.io/gdalraster/reference/read_ds.html)
   functions which include numeric, character, byte vectors or
   nativeRaster types
-- flat vector data - a hueristic is applied to make a guess, with
+- flat vector data - a heuristic is applied to make a guess, with
   alternatives to consider - helpful for recovering from missing
   metadata
+- arrays with more dimensions, from zaro, `gdalraster::mdim_read()` or
+  ndr, drawn a slice at a time with a reminder of how to get the others
+  (`slice`,
+  [`xslices()`](https://hypertidy.github.io/ximage/reference/xslices.md),
+  [`xpanels()`](https://hypertidy.github.io/ximage/reference/xslices.md))
+- coordinates as well as extents, including irregular and curvilinear
+  grids (`coords`)
 
 Missing values display as a colour of your choosing (`na.col`,
 transparent by default), a constant `alpha` can be applied over any
@@ -33,6 +41,11 @@ conventions:
 values as labels), and
 [`xrect()`](https://hypertidy.github.io/ximage/reference/xrect.md)
 (rectangles from extents).
+[`xmesh()`](https://hypertidy.github.io/ximage/reference/xmesh.md) draws
+triangle and quad meshes (cdtr, laridae, quadmesh and other mesh3d) with
+the same colour mapping. See the [arrays, coordinates and
+meshes](https://hypertidy.github.io/ximage/articles/arrays-and-meshes.html)
+vignette.
 
 The orientation is in “raster order”, i.e. when you’re looking at the
 picture it’s top left to top right, then scan lines down each row to the

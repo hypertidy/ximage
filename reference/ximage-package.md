@@ -6,9 +6,11 @@ image data itself, or can be specified in simple extent terms
 'xmin,xmax,ymin,ymax'. Numeric matrices, integer arrays, byte arrays,
 character arrays, and native rasters are supported. Flat vectors are
 supported in a limited sense with a heuristic to guess at the likely
-dimensionality and some helpers. A combination of image() and
-rasterImage() from the 'graphics' package with their good features in
-one place.
+dimensionality and some helpers. Arrays with more than two dimensions
+are drawn a slice at a time, placed by coordinates that may be irregular
+or curvilinear, and triangle and quad meshes are drawn with the same
+colour mapping. A combination of image() and rasterImage() from the
+'graphics' package with their good features in one place.
 
 ## See also
 

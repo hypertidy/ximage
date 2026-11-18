@@ -7,6 +7,19 @@ placed by extent, in raster order.
 
 - [`ximage()`](https://hypertidy.github.io/ximage/reference/ximage.md) :
   Plot an image
+- [`as_ximage()`](https://hypertidy.github.io/ximage/reference/as_ximage.md)
+  : Decode input to an image in raster order
+
+## Arrays and meshes
+
+Work through the slices of arrays with more than two dimensions, and
+draw triangle and quad meshes with the colour mapping of ximage().
+
+- [`xslices()`](https://hypertidy.github.io/ximage/reference/xslices.md)
+  [`xpanels()`](https://hypertidy.github.io/ximage/reference/xslices.md)
+  : Slices of an array
+- [`xmesh()`](https://hypertidy.github.io/ximage/reference/xmesh.md) :
+  Draw a triangle or quad mesh
 
 ## Adornments
 

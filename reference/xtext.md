@@ -10,7 +10,17 @@ order").
 ## Usage
 
 ``` r
-xtext(x, extent = NULL, add = FALSE, cex = NULL, fit = 0.9, ...)
+xtext(
+  x,
+  extent = NULL,
+  add = FALSE,
+  cex = NULL,
+  fit = 0.9,
+  ...,
+  slice = NULL,
+  xy = NULL,
+  coords = NULL
+)
 ```
 
 ## Arguments
@@ -42,6 +52,23 @@ xtext(x, extent = NULL, add = FALSE, cex = NULL, fit = 0.9, ...)
   arguments passed to [`text()`](https://rdrr.io/r/graphics/text.html),
   for example 'col'
 
+- slice:
+
+  index of the slice to draw for arrays with more than two dimensions: a
+  named list or vector, e.g. `list(time = 3, depth = 1)`, an unnamed
+  value for the first non-spatial dimension, or one row of
+  [`xslices()`](https://hypertidy.github.io/ximage/reference/xslices.md)
+  output. Default is the first slice
+
+- xy:
+
+  the two spatial dimensions, x then y, as names or positions
+
+- coords:
+
+  optional coordinates of the spatial dimensions, `list(x = , y = )` of
+  centres, edges, or curvilinear matrices (see Details)
+
 ## Value
 
 invisibly, a list with 'x', 'y' (label positions), 'labels', and 'cex'
@@ -54,9 +81,13 @@ cell, scaled by 'fit' (use 'cex' to override). Labels that are NA are
 not drawn.
 
 Input may be a matrix (values are used as labels via
-[`format()`](https://rdrr.io/r/base/format.html)), or a list in the
-style of vapour or gdalraster reader output (a row-major vector with
-'dimension'/'extent' attributes, or a 'gis' attribute).
+[`format()`](https://rdrr.io/r/base/format.html)), a list in the style
+of vapour or gdalraster reader output (a row-major vector with
+'dimension'/'extent' attributes, or a 'gis' attribute), or an array (one
+slice is labelled, see
+[`as_ximage()`](https://hypertidy.github.io/ximage/reference/as_ximage.md)).
+With irregular or curvilinear `coords` each label sits at the centre of
+its cell's corners.
 
 ## Examples
 
