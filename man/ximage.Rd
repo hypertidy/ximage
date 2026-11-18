@@ -2,10 +2,6 @@
 % Please edit documentation in R/ximage.R
 \name{ximage}
 \alias{ximage}
-\alias{ximage.raw}
-\alias{ximage.numeric}
-\alias{ximage.integer}
-\alias{ximage.character}
 \title{Plot an image}
 \usage{
 ximage(
@@ -19,72 +15,18 @@ ximage(
   col = hcl.colors(96, "YlOrRd", rev = TRUE),
   breaks = NULL,
   alpha = NULL,
-  na.col = "transparent"
-)
-
-\method{ximage}{raw}(
-  x,
-  extent = NULL,
-  zlim = NULL,
-  add = FALSE,
-  ...,
-  xlab = NULL,
-  ylab = NULL,
-  col = hcl.colors(96, "YlOrRd", rev = TRUE),
-  breaks = NULL,
-  alpha = NULL,
   na.col = "transparent",
-  force = FALSE
-)
-
-\method{ximage}{numeric}(
-  x,
-  extent = NULL,
-  zlim = NULL,
-  add = FALSE,
-  ...,
-  xlab = NULL,
-  ylab = NULL,
-  col = hcl.colors(96, "YlOrRd", rev = TRUE),
-  breaks = NULL,
-  alpha = NULL,
-  na.col = "transparent",
-  force = FALSE
-)
-
-\method{ximage}{integer}(
-  x,
-  extent = NULL,
-  zlim = NULL,
-  add = FALSE,
-  ...,
-  xlab = NULL,
-  ylab = NULL,
-  col = hcl.colors(96, "YlOrRd", rev = TRUE),
-  breaks = NULL,
-  alpha = NULL,
-  na.col = "transparent",
-  force = FALSE
-)
-
-\method{ximage}{character}(
-  x,
-  extent = NULL,
-  zlim = NULL,
-  add = FALSE,
-  ...,
-  xlab = NULL,
-  ylab = NULL,
-  col = hcl.colors(96, "YlOrRd", rev = TRUE),
-  breaks = NULL,
-  alpha = NULL,
-  na.col = "transparent",
-  force = FALSE
+  force = FALSE,
+  slice = NULL,
+  xy = NULL,
+  coords = NULL
 )
 }
 \arguments{
 \item{x}{matrix, array, raw or character matrix, native raster
-(nativeRaster, or raster), or list as output by GDAL reader functions}
+(nativeRaster, or raster), or list as output by GDAL reader functions,
+array from zaro, gdalraster \code{mdim_read()} or ndr, or atomic vector
+(guessing will apply)}
 
 \item{extent}{optional, numeric xmin,xmax,ymin,ymax}
 
@@ -113,11 +55,24 @@ nativeRaster input}
 
 \item{force}{proceed with a guessed dimension for very long bare vectors
 (see Details), default \code{FALSE}}
+
+\item{slice}{index of the slice to draw for arrays with more than two
+dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, an
+unnamed value for the first non-spatial dimension, or one row of
+\code{\link[=xslices]{xslices()}} output. Default is the first slice}
+
+\item{xy}{the two spatial dimensions, x then y, as names or positions}
+
+\item{coords}{optional coordinates of the spatial dimensions,
+\code{list(x = , y = )} of centres, edges, or curvilinear matrices (see
+Details)}
 }
 \value{
-invisibly, a list with 'x' (the colour data as plotted) and
-'extent' (xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of
-the input if not supplied)
+invisibly, a list with 'x' (the colour data as plotted), 'extent'
+(xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of the input
+if not supplied), 'zlim' (the data range the colours were mapped to, use
+it to draw other slices with the same colours), and for arrays 'dims',
+'slice' and 'labels' (see \code{\link[=as_ximage]{as_ximage()}})
 }
 \description{
 ximage combines the best of \code{graphics::image()} and \code{graphics::rasterImage()}.
@@ -135,11 +90,23 @@ ximage combines the best of \code{graphics::image()} and \code{graphics::rasterI
 \item Allow general numeric values.
 \item Start a plot from scratch without setting up a plot to paint to.
 \item Plot by default in 0,ncol,0,nrow if unspecified.
+\item Draw one slice of arrays with more dimensions, such as Zarr and
+NetCDF reads from zaro, gdalraster \code{mdim_read()} or ndr.
+\item Place the image by coordinates, including irregular and
+curvilinear grids.
 }
 
 Data orientation is "raster order", the first cell is the top-left of the
 displayed image, following scan lines down the page (see the package
 vignette on orientation).
+
+Arrays with more than two dimensions are drawn one slice at a time,
+the spatial dimensions are found by name (or set with \code{xy}), the slice
+with \code{slice}, and a message says which slice was drawn and how to get the
+others. Coordinates from the input's metadata or from \code{coords} orient and
+place the image, irregular or curvilinear coordinates are drawn cell by
+cell. See \code{\link[=as_ximage]{as_ximage()}} for the details, and \code{\link[=xslices]{xslices()}} and \code{\link[=xpanels]{xpanels()}}
+for working through slices.
 
 Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
 width/height/depth attributes) are accepted and a dimension is guessed
@@ -176,5 +143,25 @@ ximage(v, na.col = "hotpink")
 ## message listing candidate shapes (ncol x nrow); here the guess 87x61
 ## is the mirror of the true 61x87, so pick from the candidates
 ximage(as.vector(t(volcano)))
+
+## we don't get the right shape because our image is vertically tall
+## set manually
 ximage(matrix(as.vector(t(volcano)), ncol = 61, byrow = TRUE))
+
+## see that with the transpose form (landscape orientation) our guess is corrrect
+## but is that what was intended? (impossible to determine completely automatically)
+ximage(as.vector(volcano))
+
+## arrays: (lon, lat, time) as zaro::zaro_array() gives, latitude south
+## to north, the first slice is drawn north up with a message
+a <- array(c(t(volcano[87:1, ]), t(volcano[87:1, ]) * 0.8),
+           c(lon = 61, lat = 87, time = 2))
+lonlat <- list(x = seq(140, 150, length.out = 61), y = seq(-45, -30, length.out = 87))
+o <- ximage(a, coords = lonlat)
+ximage(a, coords = lonlat, slice = list(time = 2), zlim = o$zlim)
+
+## curvilinear coordinates, drawn cell by cell
+lon <- outer(1:87, 1:61, function(i, j) j + i / 10)
+lat <- outer(1:87, 1:61, function(i, j) -i + j / 20)
+ximage(volcano, coords = list(x = lon, y = lat), asp = 1)
 }

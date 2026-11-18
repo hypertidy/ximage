@@ -26,6 +26,15 @@ reference:
     placed by extent, in raster order.
   contents:
   - ximage
+  - as_ximage
+
+- title: Arrays and meshes
+  desc: >
+    Work through the slices of arrays with more than two dimensions, and draw
+    triangle and quad meshes with the colour mapping of ximage().
+  contents:
+  - xslices
+  - xmesh
 
 - title: Adornments
   desc: >
@@ -50,6 +59,7 @@ articles:
   contents:
   - why-ximage
   - orientation
+  - arrays-and-meshes
   - articles/dynamic-drawing
 
 

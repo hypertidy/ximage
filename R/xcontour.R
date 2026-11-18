@@ -2,8 +2,16 @@
 #'
 #' Like contour() but to work with [ximage()]
 #'
-#' Input may be a matrix or a list from `gdal_raster_data()` in the vapour package or from `read_ds()`
-#' in the gdalraster package.
+#' Input may be anything [ximage()] accepts that holds data values: a matrix,
+#' a list from `gdal_raster_data()` in the vapour package or from `read_ds()`
+#' in the gdalraster package, or an array (one slice is drawn, see
+#' [as_ximage()]).
+#'
+#' With irregular or curvilinear `coords` the contours are traced in the
+#' index space of the matrix and placed by interpolating the cell centre
+#' coordinates. Curvilinear contours are drawn with [graphics::lines()]
+#' without labels ('levels' and 'nlevels' are used, other arguments go to
+#' `lines()`).
 #'
 #' @param x something we can contour
 #' @inheritParams ximage
@@ -19,69 +27,122 @@
 #'
 #' xcontour(v, add = TRUE, extent = ex, col = "white")
 #' xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
-xcontour <- function(x, extent = NULL, ..., add = FALSE) {
+#'
+#' ## curvilinear
+#' lon <- outer(1:87, 1:61, function(i, j) j + i / 10)
+#' lat <- outer(1:87, 1:61, function(i, j) -i + j / 20)
+#' ximage(volcano, coords = list(x = lon, y = lat), asp = 1)
+#' xcontour(volcano, coords = list(x = lon, y = lat), add = TRUE)
+xcontour <- function(x, extent = NULL, ..., add = FALSE, slice = NULL, xy = NULL,
+                     coords = NULL) {
   UseMethod("xcontour")
 }
 #' @export
-xcontour.default <- function(x, extent = NULL, ..., add = FALSE) {
-  if (is.numeric(x) && is.null(dim(x)) && "gis" %in% names(attributes(x))) {
-    ## vector output from gdalraster, first band
-    gis <- attr(x, "gis")
-    if (is.null(extent)) extent <- gis$bbox[c(1, 3, 2, 4)]
-    x <- matrix(x[seq_len(prod(gis$dim[1:2]))], gis$dim[2L], byrow = TRUE)
-  }
-  if (is.null(dim(x)) || length(dim(x)) < 2L) {
-    stop("'x' must be a matrix")
-  }
-  ## default extent is the index space of the input, before reorientation
-  if (is.null(extent)) extent <- c(0, ncol(x), 0, nrow(x))
-  x <- t(x[nrow(x):1, ])
-  xre <- diff(extent[1:2])/nrow(x)
-  yre <- diff(extent[3:4])/ncol(x)
-  xx <- seq(extent[1] + xre/2, extent[2] - xre/2, length.out = nrow(x) )
-  yy <- seq(extent[3] + yre/2, extent[4] - yre/2, length.out = ncol(x) )
-  graphics::contour(xx, yy, x, add = add, ...)
-}
-#' @export
-xcontour.list <- function(x, extent = NULL, ..., add = FALSE) {
-
-  if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
-    ## smells like sf
-    stop("no xcontour for sf")
-    ximage_sf_data(x, extent = extent,  add = add, ...)
-    return(invisible(x))
-  }
-  ## validate that we have extent, dimension as attributes
-  attrs <- attributes(x)
-  if ("gis" %in% names(attrs)) {
-    ## gdalraster output
-    attrs <- attrs[["gis"]]
-    attrs$dimension <- attrs$dim
-    attrs$extent <- attrs$bbox[c(1, 3, 2, 4)]
-  }
-  if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
-  dimension <- attrs$dimension
-  ## a dimension attribute (vapour, gdalraster gis) means the elements hold
-  ## GDAL row-major data; with no dimension attribute a matrix element is
-  ## taken to be an already-oriented R matrix (same rule as ximage.list)
-  row_major <- !is.null(dimension)
-  if (is.null(dimension) &&
-      (is.null(dim(x[[1L]])) || length(dim(x[[1L]])) < 2L)) {
-    stop("no dimension known")
-  }
-  if (is.character(x[[1L]])) {
-    stop("cannot contour colour data")
-  }
-
-  m <- if (row_major) {
-    matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
+xcontour.default <- function(x, extent = NULL, ..., add = FALSE, slice = NULL,
+                             xy = NULL, coords = NULL) {
+  .stop_if_bare(x)
+  d <- as_ximage(x, extent = extent, slice = slice, xy = xy, coords = coords,
+                 bands = FALSE,
+                 verbose = getOption("ximage.verbose", TRUE) && !add)
+  m <- .value_matrix(d$data, "contour")
+  if (is.null(d$corners)) {
+    extent <- d$extent
+    z <- t(m[nrow(m):1, , drop = FALSE])
+    xre <- diff(extent[1:2]) / nrow(z)
+    yre <- diff(extent[3:4]) / ncol(z)
+    xx <- seq(extent[1] + xre / 2, extent[2] - xre / 2, length.out = nrow(z))
+    yy <- seq(extent[3] + yre / 2, extent[4] - yre / 2, length.out = ncol(z))
+    graphics::contour(xx, yy, z, add = add, ...)
+  } else if (.is_rectilinear(d$corners)) {
+    cc <- .cell_centres(d)
+    graphics::contour(cc$x[1L, ], rev(cc$y[, 1L]), t(m[nrow(m):1, , drop = FALSE]),
+                      add = add, ...)
   } else {
-    x[[1L]]
+    .contour_curvilinear(m, d$corners, d$centres, add = add, ...)
   }
-  xcontour(m, extent = extent, add = add, ...)
+  invisible(NULL)
+}
 
-  ##if (coastline) graphics::lines(coastline(extent, projection = projection, dimension = c(512, 512)))
-
-  ## return the materialized data
+## bare vectors are guessed by ximage() but not by the adornments
+.stop_if_bare <- function(x) {
+  if (is.atomic(x) && is.null(dim(x)) && is.null(attr(x, "gis", exact = TRUE)) &&
+      !all(c("width", "height", "depth") %in% names(attributes(x)))) {
+    stop("'x' must be a matrix", call. = FALSE)
+  }
   invisible(x)
+}
+
+## numeric single-band matrix from decoded data
+.value_matrix <- function(m, what = "contour") {
+  if (inherits(m, "nativeRaster") || is.character(m)) {
+    stop(sprintf("cannot %s colour data", what), call. = FALSE)
+  }
+  if (length(dim(m)) != 2L) stop("'x' must be a matrix", call. = FALSE)
+  if (is.raw(m)) m <- matrix(as.integer(m), nrow(m))
+  m
+}
+
+## corners ((ny + 1) x (nx + 1)) of a grid with straight rows and columns
+.is_rectilinear <- function(corners) {
+  x <- corners$x
+  y <- corners$y
+  all(x == rep(x[1L, ], each = nrow(x))) && all(y == y[, 1L])
+}
+
+## cell centres (ny x nx), as given or from the corners of decoded data
+.cell_centres <- function(d) {
+  if (!is.null(d$centres)) return(d$centres)
+  corners <- d$corners
+  f <- function(m) {
+    r <- nrow(m)
+    k <- ncol(m)
+    (m[-1L, -1L] + m[-r, -1L] + m[-1L, -k] + m[-r, -k]) / 4
+  }
+  list(x = f(corners$x), y = f(corners$y))
+}
+
+## bilinear interpolation of matrix M at fractional (row, col)
+.bilinear <- function(M, r, u) {
+  nr <- nrow(M)
+  nc <- ncol(M)
+  r0 <- pmin(pmax(floor(r), 1), nr - 1)
+  u0 <- pmin(pmax(floor(u), 1), nc - 1)
+  fr <- r - r0
+  fu <- u - u0
+  M[cbind(r0, u0)] * (1 - fr) * (1 - fu) + M[cbind(r0, u0 + 1)] * (1 - fr) * fu +
+    M[cbind(r0 + 1, u0)] * fr * (1 - fu) + M[cbind(r0 + 1, u0 + 1)] * fr * fu
+}
+
+.contour_curvilinear <- function(m, corners, centres = NULL, add = FALSE, ...) {
+  args <- list(...)
+  ny <- nrow(m)
+  nx <- ncol(m)
+  if (nx < 2L || ny < 2L) stop("need at least 2 x 2 cells to contour", call. = FALSE)
+  lev <- args$levels
+  if (is.null(lev)) {
+    nlev <- if (is.null(args$nlevels)) 10 else args$nlevels
+    lev <- pretty(range(m, finite = TRUE), nlev)
+  }
+  ## contourLines() wants z[x, y] with y increasing: reverse the rows
+  cl <- grDevices::contourLines(seq_len(nx), seq_len(ny),
+                                t(m[ny:1, , drop = FALSE]), levels = lev)
+  cc <- .cell_centres(list(corners = corners, centres = centres))
+  plot_args <- c("asp", "main", "sub", "xlim", "ylim", "axes", "frame.plot", "xlab", "ylab")
+  drop <- c("levels", "nlevels", "labels", "labcex", "drawlabels", "method",
+            "vfont", plot_args)
+  if (!add) {
+    pa <- args[intersect(names(args), plot_args)]
+    if (is.null(pa$xlab)) pa$xlab <- ""
+    if (is.null(pa$ylab)) pa$ylab <- ""
+    do.call(graphics::plot, c(list(x = range(corners$x, finite = TRUE),
+                                   y = range(corners$y, finite = TRUE),
+                                   type = "n", xaxs = "i", yaxs = "i"), pa))
+  }
+  la <- args[setdiff(names(args), drop)]
+  for (l in cl) {
+    r <- ny + 1 - l$y
+    do.call(graphics::lines, c(list(x = .bilinear(cc$x, r, l$x),
+                                    y = .bilinear(cc$y, r, l$x)), la))
+  }
+  invisible(cl)
 }

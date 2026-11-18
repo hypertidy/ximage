@@ -4,7 +4,15 @@
 \alias{xcontour}
 \title{Contour matrix data and draw}
 \usage{
-xcontour(x, extent = NULL, ..., add = FALSE)
+xcontour(
+  x,
+  extent = NULL,
+  ...,
+  add = FALSE,
+  slice = NULL,
+  xy = NULL,
+  coords = NULL
+)
 }
 \arguments{
 \item{x}{something we can contour}
@@ -31,6 +39,17 @@ nativeRaster input}
   }}
 
 \item{add}{add to plot, or start afresh}
+
+\item{slice}{index of the slice to draw for arrays with more than two
+dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, an
+unnamed value for the first non-spatial dimension, or one row of
+\code{\link[=xslices]{xslices()}} output. Default is the first slice}
+
+\item{xy}{the two spatial dimensions, x then y, as names or positions}
+
+\item{coords}{optional coordinates of the spatial dimensions,
+\code{list(x = , y = )} of centres, edges, or curvilinear matrices (see
+Details)}
 }
 \value{
 nothing, called for its side effect of creating or adding to a plot
@@ -39,8 +58,16 @@ nothing, called for its side effect of creating or adding to a plot
 Like contour() but to work with \code{\link[=ximage]{ximage()}}
 }
 \details{
-Input may be a matrix or a list from \code{gdal_raster_data()} in the vapour package or from \code{read_ds()}
-in the gdalraster package.
+Input may be anything \code{\link[=ximage]{ximage()}} accepts that holds data values: a matrix,
+a list from \code{gdal_raster_data()} in the vapour package or from \code{read_ds()}
+in the gdalraster package, or an array (one slice is drawn, see
+\code{\link[=as_ximage]{as_ximage()}}).
+
+With irregular or curvilinear \code{coords} the contours are traced in the
+index space of the matrix and placed by interpolating the cell centre
+coordinates. Curvilinear contours are drawn with \code{\link[graphics:lines]{graphics::lines()}}
+without labels ('levels' and 'nlevels' are used, other arguments go to
+\code{lines()}).
 }
 \examples{
 #EPSG:27200 see https://github.com/mdsumner/volcano
@@ -50,4 +77,10 @@ ximage(v, extent = ex, asp = 1)
 
 xcontour(v, add = TRUE, extent = ex, col = "white")
 xrect(ex, add = TRUE, border = "hotpink", lwd = 5)
+
+## curvilinear
+lon <- outer(1:87, 1:61, function(i, j) j + i / 10)
+lat <- outer(1:87, 1:61, function(i, j) -i + j / 20)
+ximage(volcano, coords = list(x = lon, y = lat), asp = 1)
+xcontour(volcano, coords = list(x = lon, y = lat), add = TRUE)
 }

@@ -9,7 +9,8 @@ with_null_device <- function(code) {
 test_that("ximage returns the plotted colours and extent invisibly", {
   with_null_device({
     res <- ximage(volcano)
-    expect_named(res, c("x", "extent"))
+    expect_named(res, c("x", "extent", "zlim", "dims", "slice", "labels"))
+    expect_identical(res$zlim, range(volcano))
     expect_identical(res$extent, c(0, ncol(volcano), 0, nrow(volcano)))
     expect_identical(dim(res$x), dim(volcano))
   })
@@ -120,15 +121,17 @@ test_that("raster class input tolerates NA colours", {
   })
 })
 
-test_that("all methods match the generic signature", {
+test_that("all methods match their generic's signature", {
   ## methods must lead with the generic's arguments in order, and may add
-  ## method-specific arguments after them (e.g. 'force' for bare vectors)
-  gen <- names(formals(ximage))
-  meths <- c("ximage.default", "ximage.list", "ximage.numeric",
-             "ximage.integer", "ximage.raw", "ximage.character",
-             "ximage.nativeRaster", "ximage.raster")
-  for (f in meths) {
-    fmls <- names(formals(getFromNamespace(f, "ximage")))
-    expect_identical(fmls[seq_along(gen)], gen, info = f)
+  ## method-specific arguments after them
+  pairs <- list(ximage = "ximage.default", as_ximage = c("as_ximage.default", "as_ximage.ximage_data"),
+                xcontour = "xcontour.default", xtext = "xtext.default",
+                xmesh = "xmesh.default")
+  for (g in names(pairs)) {
+    gen <- names(formals(getFromNamespace(g, "ximage")))
+    for (f in pairs[[g]]) {
+      fmls <- names(formals(getFromNamespace(f, "ximage")))
+      expect_identical(fmls[seq_along(gen)], gen, info = f)
+    }
   }
 })
