@@ -116,8 +116,8 @@ data
 }
 Regularly spaced coordinates give an extent and the image is drawn with
 \code{\link[graphics:rasterImage]{graphics::rasterImage()}}. Irregular spacing, curvilinear coordinates and
-rotated or sheared affine transforms are drawn cell by cell as quads.
-Corners are found from centres by averaging the four
+rotated or sheared affine transforms are drawn cell by cell as quads (see
+\code{\link[=xmesh]{xmesh()}}). Corners are found from centres by averaging the four
 neighbours and extrapolating at the edges (longitudes that wrap need to be
 made continuous first).
 

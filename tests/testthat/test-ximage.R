@@ -125,7 +125,8 @@ test_that("all methods match their generic's signature", {
   ## methods must lead with the generic's arguments in order, and may add
   ## method-specific arguments after them
   pairs <- list(ximage = "ximage.default", as_ximage = c("as_ximage.default", "as_ximage.ximage_data"),
-                xcontour = "xcontour.default", xtext = "xtext.default")
+                xcontour = "xcontour.default", xtext = "xtext.default",
+                xmesh = "xmesh.default")
   for (g in names(pairs)) {
     gen <- names(formals(getFromNamespace(g, "ximage")))
     for (f in pairs[[g]]) {

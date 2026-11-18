@@ -49,6 +49,14 @@
  per non-spatial dimension, metadata only), its rows work as `slice`. New
  `xpanels()` draws several slices with one colour scale.
 
+* New `xmesh()` draws triangle and quad meshes filled by vertex or face
+ values with the colour arguments of `ximage()`: cdtr and RTriangle
+ triangulations, laridae tables, rgl 'mesh3d' objects (quadmesh, anglr,
+ textures) and bare vertices with an index (#5). The "polygon" method draws
+ all faces in one call, the "raster" method interpolates onto the pixel
+ grid of the plot via `cdtr::cdt_locate()`. Faces with a non-finite vertex
+ are dropped, so projected meshes can mark failures with `NA`.
+
 * ximage now depends on R >= 3.5.0.
 
 * Removed unused internal colour helpers left behind by the move to palr.

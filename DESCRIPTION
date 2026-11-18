@@ -19,9 +19,12 @@ Depends:
 LazyData: true
 Suggests: 
     altarr,
+    cdtr,
     gdalraster,
     knitr,
+    laridae,
     ndr,
+    quadmesh,
     rmarkdown,
     spelling,
     testthat (>= 3.0.0),

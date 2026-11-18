@@ -28,11 +28,13 @@ reference:
   - ximage
   - as_ximage
 
-- title: Arrays
+- title: Arrays and meshes
   desc: >
-    Work through the slices of arrays with more than two dimensions.
+    Work through the slices of arrays with more than two dimensions, and draw
+    triangle and quad meshes with the colour mapping of ximage().
   contents:
   - xslices
+  - xmesh
 
 - title: Adornments
   desc: >
