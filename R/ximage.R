@@ -14,11 +14,22 @@
 #'    \item Allow general numeric values.
 #'    \item Start a plot from scratch without setting up a plot to paint to.
 #'    \item Plot by default in 0,ncol,0,nrow if unspecified.
+#'    \item Draw one slice of arrays with more dimensions, such as Zarr and
+#'    NetCDF reads from zaro, gdalraster `mdim_read()` or ndr.
+#'    \item Place the image by coordinates, including irregular and
+#'    curvilinear grids.
 #' }
 #'
 #' Data orientation is "raster order", the first cell is the top-left of the
 #' displayed image, following scan lines down the page (see the package
 #' vignette on orientation).
+#'
+#' Arrays with more than two dimensions are drawn one slice at a time,
+#' the spatial dimensions are found by name (or set with `xy`), the slice
+#' with `slice`, and a message says which slice was drawn and how to get the
+#' others. Coordinates from the input's metadata or from `coords` orient and
+#' place the image, irregular or curvilinear coordinates are drawn cell by
+#' cell. See [as_ximage()] for the details.
 #'
 #' Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
 #' width/height/depth attributes) are accepted and a dimension is guessed
@@ -45,7 +56,9 @@
 #' bands. Missing values (NA, NaN) display as 'na.col' in all cases.
 #'
 #' @param x matrix, array, raw or character matrix, native raster
-#'   (nativeRaster, or raster), or list as output by GDAL reader functions, or atomic vector (guessing will apply)
+#'   (nativeRaster, or raster), or list as output by GDAL reader functions,
+#'   array from zaro, gdalraster `mdim_read()` or ndr, or atomic vector
+#'   (guessing will apply)
 #' @param extent optional, numeric xmin,xmax,ymin,ymax
 #' @param zlim optional, absolute range of data to map colours to (maintains
 #'   comparable colours across plots); values outside display as 'na.col';
@@ -63,10 +76,13 @@
 #' @param na.col colour for missing values, default "transparent"
 #' @param force proceed with a guessed dimension for very long bare vectors
 #'   (see Details), default `FALSE`
+#' @inheritParams as_ximage
 #'
-#' @return invisibly, a list with 'x' (the colour data as plotted) and
-#'   'extent' (xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of
-#'   the input if not supplied)
+#' @return invisibly, a list with 'x' (the colour data as plotted), 'extent'
+#'   (xmin, xmax, ymin, ymax used, the 0,ncol 0,nrow index space of the input
+#'   if not supplied), 'zlim' (the data range the colours were mapped to, use
+#'   it to draw other slices with the same colours), and for arrays 'dims',
+#'   'slice' and 'labels' (see [as_ximage()])
 #' @export
 #' @importFrom grDevices hcl.colors rgb col2rgb colorRampPalette
 #' @importFrom graphics rasterImage
@@ -89,295 +105,117 @@
 #' ## see that with the transpose form (landscape orientation) our guess is corrrect
 #' ## but is that what was intended? (impossible to determine completely automatically)
 #' ximage(as.vector(volcano))
+#'
+#' ## arrays: (lon, lat, time) as zaro::zaro_array() gives, latitude south
+#' ## to north, the first slice is drawn north up with a message
+#' a <- array(c(t(volcano[87:1, ]), t(volcano[87:1, ]) * 0.8),
+#'            c(lon = 61, lat = 87, time = 2))
+#' lonlat <- list(x = seq(140, 150, length.out = 61), y = seq(-45, -30, length.out = 87))
+#' o <- ximage(a, coords = lonlat)
+#' ximage(a, coords = lonlat, slice = list(time = 2), zlim = o$zlim)
+#'
+#' ## curvilinear coordinates, drawn cell by cell
+#' lon <- outer(1:87, 1:61, function(i, j) j + i / 10)
+#' lat <- outer(1:87, 1:61, function(i, j) -i + j / 20)
+#' ximage(volcano, coords = list(x = lon, y = lat), asp = 1)
 ximage <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                    xlab = NULL, ylab = NULL,
                    col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                   alpha = NULL, na.col = "transparent") {
+                   alpha = NULL, na.col = "transparent", force = FALSE,
+                   slice = NULL, xy = NULL, coords = NULL) {
   UseMethod("ximage")
-}
-
-
-#' @export
-#' @importFrom stats na.omit
-ximage.list <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                        xlab = NULL, ylab = NULL,
-                        col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                        alpha = NULL, na.col = "transparent") {
-
-  if (all(c("geotransform", "cols", "rows", "driver") %in% names(x))) {
-    ## smells like sf
-    out <- ximage_sf_data(x, extent = extent, zlim = zlim, add = add, ...,
-                          xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                          alpha = alpha, na.col = na.col)
-    return(invisible(out))
-  }
-
-  ## validate that we have extent, dimension as attributes
-  attrs <- attributes(x)
-  if ("gis" %in% names(attrs)) {
-    ## gdalraster output
-    attrs <- attrs[["gis"]]
-    attrs$dimension <- attrs$dim
-    attrs$projection <- attrs$srs
-    attrs$extent <- attrs$bbox[c(1, 3, 2, 4)]
-  }
-  if (!is.null(attrs$extent) && is.null(extent)) extent <- attrs$extent
-  dimension <- attrs$dimension
-  ## a dimension attribute (vapour, gdalraster gis) means the elements hold
-  ## GDAL row-major data, whether stored as vectors or as (ncol, nrow)
-  ## matrices (e.g. from asplit()); with no dimension attribute a matrix
-  ## element is taken to be an already-oriented R matrix
-  row_major <- !is.null(dimension)
-  if (is.null(dimension)) {
-    dm1 <- dim(x[[1L]])
-    if (!is.null(dm1) && length(dm1) >= 2L) {
-      dimension <- dm1[2:1]
-    } else {
-      stop("no dimension known")
-    }
-  }
-
-  if (is.character(x[[1L]])) {
-    first <- stats::na.omit(x[[1L]])
-    if (length(first) && (grepl("^#", first[1L]) ||
-                          first[1L] %in% grDevices::colours())) {
-      ## we have image (colour) data
-    } else {
-      ## can't read data in ximage
-      stop("can't read data in this package")
-    }
-  }
-
-  if (inherits(x[[1L]], "nativeRaster")) {
-    out <- ximage(x[[1L]], extent = extent, zlim = zlim, add = add, ...,
-                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                  alpha = alpha, na.col = na.col)
-    return(invisible(out))
-  }
-
-  if (length(x) %in% c(3, 4)) {
-    if (row_major) {
-      arr <- aperm(array(unlist(lapply(x, as.vector), use.names = FALSE),
-                         c(dimension[1:2], length(x))),
-                   c(2, 1, 3))
-    } else {
-      arr <- array(unlist(x, use.names = FALSE), c(dim(x[[1L]])[1:2], length(x)))
-    }
-    out <- ximage(arr,
-                  extent = extent, zlim = zlim, add = add, ...,
-                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                  alpha = alpha, na.col = na.col)
-  } else {
-    m <- if (row_major) {
-      matrix(as.vector(x[[1L]]), dimension[2L], byrow = TRUE)
-    } else {
-      x[[1L]]
-    }
-    out <- ximage(m,
-                  extent = extent, zlim = zlim, add = add, ...,
-                  xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                  alpha = alpha, na.col = na.col)
-  }
-  invisible(out)
-}
-
-#' @rdname ximage
-#' @export
-ximage.raw <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                       xlab = NULL, ylab = NULL,
-                       col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                       alpha = NULL, na.col = "transparent", force = FALSE) {
-  x <- .unpack_whd(x)
-  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
-    x <- .ximage_guess(x, force = force)
-  }
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
-                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                 alpha = alpha, na.col = na.col)
-}
-
-#' @rdname ximage
-#' @export
-ximage.numeric <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                           xlab = NULL, ylab = NULL,
-                           col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent", force = FALSE) {
-  x <- .unpack_whd(x)
-  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
-    x <- .ximage_guess(x, force = force)
-  }
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
-                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                 alpha = alpha, na.col = na.col)
-}
-
-#' @rdname ximage
-#' @export
-ximage.integer <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                           xlab = NULL, ylab = NULL,
-                           col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent", force = FALSE) {
-  x <- .unpack_whd(x)
-  if (is.null(dim(x)) && !"gis" %in% names(attributes(x))) {
-    x <- .ximage_guess(x, force = force)
-  }
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
-                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                 alpha = alpha, na.col = na.col)
-}
-
-#' @rdname ximage
-#' @export
-ximage.character <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                             xlab = NULL, ylab = NULL,
-                             col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                             alpha = NULL, na.col = "transparent", force = FALSE) {
-  ## a bare character vector of colours (hex or named)
-  if (is.null(dim(x))) {
-    x <- .ximage_guess(x, force = force)
-  }
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
-                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                 alpha = alpha, na.col = na.col)
-}
-
-## unpack fastpng-style width/height/depth attributed vectors to array,
-## dropping a depth-1 dimension (grey stays a matrix)
-.unpack_whd <- function(x) {
-  attrs <- attributes(x)
-  if (all(c("width", "height", "depth") %in% names(attrs))) {
-    x <- aperm(array(x, c(attrs$depth, attrs$width, attrs$height)), c(3, 2, 1))
-    if (attrs$depth == 1) x <- x[, , 1L, drop = TRUE]
-  }
-  x
 }
 
 #' @export
 ximage.default <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
                            xlab = NULL, ylab = NULL,
                            col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                           alpha = NULL, na.col = "transparent", force = FALSE) {
+                           alpha = NULL, na.col = "transparent", force = FALSE,
+                           slice = NULL, xy = NULL, coords = NULL) {
+  d <- as_ximage(x, extent = extent, slice = slice, xy = xy, coords = coords,
+                 force = force)
+  out <- .draw_image(d, zlim = zlim, add = add, ..., xlab = xlab, ylab = ylab,
+                     col = col, breaks = breaks, alpha = alpha, na.col = na.col)
+  invisible(out)
+}
 
-  if (is.list(x)) {
-    out <- ximage.list(x, extent = extent, zlim = zlim, add = add, ...,
-                       xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                       alpha = alpha, na.col = na.col)
-    return(invisible(out))
+## draw decoded data (from as_ximage()), placed by extent or by corners
+.draw_image <- function(d, zlim = NULL, add = FALSE, ..., xlab = NULL, ylab = NULL,
+                        col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
+                        alpha = NULL, na.col = "transparent") {
+  x <- d$data
+  if (inherits(x, "nativeRaster")) {
+    if (!is.null(alpha)) warning("'alpha' is not supported for nativeRaster input, ignored")
+    hex <- x
+    zl <- NULL
+  } else {
+    zl <- .zlim_of(x, zlim, breaks)
+    ## single choke point: everything becomes a hex colour matrix
+    hex <- to_hex(x, col = col, breaks = breaks, zlim = zlim,
+                  alpha = alpha, na.col = na.col)
   }
-
-  if (is.numeric(x) && "gis" %in% names(attributes(x))) {
-    ## vector output from gdalraster
-    gis <- attr(x, "gis")
-    x_list <- asplit(array(x, dim = gis$dim), MARGIN = 3)
-    attr(x_list, "gis") <- gis
-    out <- ximage.list(x_list, extent = extent, zlim = zlim, add = add, ...,
-                       xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                       alpha = alpha, na.col = na.col)
-    return(invisible(out))
-  }
-
-  ## safety net for atomic vectors that dispatch straight here (logical,
-  ## or classed vectors), same guess path as the explicit vector methods
-  if (!is.null(x) && is.atomic(x) && is.null(dim(x))) {
-    x <- .unpack_whd(x)
-    if (is.null(dim(x))) x <- .ximage_guess(x, force = force)
-  }
-
-  stopifnot(is.array(x) || is.matrix(x))
-
-  ## single choke point: everything becomes a hex colour matrix
-  x <- to_hex(x, col = col, breaks = breaks, zlim = zlim,
-              alpha = alpha, na.col = na.col)
-
-  if (is.null(extent)) {
-    extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
-  }
+  extent <- d$extent
   if (is.null(xlab)) xlab <- ""
   if (is.null(ylab)) ylab <- ""
-
-  if (is.list(extent) && length(extent) == 2) {
-    stop("curvilinear 'extent' (list of x, y arrays) is not supported, see the quadmesh package")
-  }
   if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i",
                  xlab = xlab, ylab = ylab)
-
-  graphics::rasterImage(x, extent[1L], extent[3L], extent[2L], extent[4L],
-                        interpolate = FALSE)
-  invisible(list(x = x, extent = extent))
+  if (is.null(d$corners)) {
+    graphics::rasterImage(hex, extent[1L], extent[3L], extent[2L], extent[4L],
+                          interpolate = FALSE)
+  } else {
+    .draw_quads(d$corners, hex)
+  }
+  list(x = hex, extent = extent, zlim = zl, dims = d$dims, slice = d$slice,
+       labels = d$labels)
 }
 
-#' @export
-ximage.nativeRaster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                                xlab = NULL, ylab = NULL,
-                                col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                                alpha = NULL, na.col = "transparent") {
-  if (!is.null(alpha)) warning("'alpha' is not supported for nativeRaster input, ignored")
-  if (is.null(extent)) {
-    extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
-  }
-  if (is.null(xlab)) xlab <- ""
-  if (is.null(ylab)) ylab <- ""
-
-  if (is.list(extent) && length(extent) == 2) {
-    stop("curvilinear 'extent' (list of x, y arrays) is not supported, see the quadmesh package")
-  }
-  if (!add) plot(extent[1:2], extent[3:4], type = "n", ..., xaxs = "i", yaxs = "i",
-                 xlab = xlab, ylab = ylab)
-  graphics::rasterImage(x, extent[1L], extent[3L], extent[2L], extent[4L],
-                        interpolate = FALSE)
-  invisible(list(x = x, extent = extent))
+## the data range colours are mapped to, single band data only
+.zlim_of <- function(x, zlim = NULL, breaks = NULL) {
+  if (!is.null(zlim)) return(range(zlim))
+  if (!is.null(breaks)) return(range(breaks))
+  dm <- dim(x)
+  single <- length(dm) == 2L || (length(dm) == 3L && dm[3L] == 1L)
+  if (!single || is.character(x)) return(NULL)
+  v <- if (is.raw(x)) as.integer(x) else as.numeric(x)
+  v <- v[is.finite(v)]
+  if (!length(v)) NULL else range(v)
 }
 
-#' @export
-ximage.raster <- function(x, extent = NULL, zlim = NULL, add = FALSE, ...,
-                          xlab = NULL, ylab = NULL,
-                          col = hcl.colors(96, "YlOrRd", rev = TRUE), breaks = NULL,
-                          alpha = NULL, na.col = "transparent") {
-  if (is.null(extent)) {
-    extent <- c(0, dim(x)[2L], 0, dim(x)[1L])
-  }
-  if (is.null(xlab)) xlab <- ""
-  if (is.null(ylab)) ylab <- ""
-  x <- to_hex(matrix(as.character(x), dim(x)[1L], dim(x)[2L]),
-              alpha = alpha, na.col = na.col)
-  ximage.default(x, extent = extent, zlim = zlim, add = add, ...,
-                 xlab = xlab, ylab = ylab, col = col, breaks = breaks,
-                 alpha = NULL, na.col = na.col)
+## curvilinear or irregular cells: each cell is a quad from the corner
+## matrices ((nrow + 1) x (ncol + 1)), filled with its colour
+.draw_quads <- function(corners, hex) {
+  ny <- nrow(hex)
+  nx <- ncol(hex)
+  i <- rep(seq_len(nx), each = ny)
+  j <- rep(seq_len(ny), nx)
+  n1 <- ny + 1L
+  idx <- cbind((i - 1L) * n1 + j, i * n1 + j, i * n1 + j + 1L, (i - 1L) * n1 + j + 1L)
+  fill <- as.vector(hex)
+  ## outlines in the fill colour close the hairline seams that antialiased
+  ## devices leave between adjacent polygons
+  .draw_faces(as.vector(corners$x), as.vector(corners$y), idx, fill = fill,
+              border = fill, drop_transparent = TRUE)
 }
 
-
-.gt_dim_to_extent <- function(x, dim) {
-  xx <- c(x[1], x[1] + dim[1] * x[2])
-  yy <- c(x[4] + dim[2] * x[6], x[4])
-  c(xx, yy)
-}
-
-ximage_sf_data <- function(x, extent = NULL, ...) {
-  d <- attr(x, "data")
-  dm <- dim(d)
-  do_extent <- TRUE
-  if (!is.null(extent)) {
-    do_extent <- FALSE
+## draw faces (rows of 'idx', vertex indices) as polygons in one call,
+## dropping faces with a non-finite vertex
+.draw_faces <- function(vx, vy, idx, fill = NA, border = NA, drop_transparent = FALSE) {
+  if (!nrow(idx)) return(invisible(0L))
+  k <- ncol(idx)
+  fx <- matrix(vx[idx], ncol = k)
+  fy <- matrix(vy[idx], ncol = k)
+  ok <- rowSums(!is.finite(fx) | !is.finite(fy)) == 0L
+  n <- nrow(idx)
+  fill <- rep_len(fill, n)
+  border <- rep_len(border, n)
+  if (drop_transparent) {
+    clear <- is.na(fill) | fill == "transparent" |
+      (nchar(fill) == 9L & substr(fill, 8L, 9L) == "00")
+    ok <- ok & !clear
   }
-  if (is.null(d)) stop("no data in sf read object")
-
-  if (is.null(dm) || length(dm) < 2) {
-    d <- matrix(d)
-    if (!is.null(extent)) warning("extent ignored for 1D array")
-    extent <- NULL
-  } else if (length(dm) > 2) {
-    d <- matrix(d[seq_len(prod(dm[1:2]))], dm[1L], dm[2L])
-  }
-  if (do_extent) {
-    ## sf gdal_read doesn't update the geotransform offsets so do that here
-    gt <- x$geotransform
-    if (x$cols[1] > 1) {
-      gt[1] <- gt[1] + gt[2] * (x$cols[1] - 1)
-    }
-    if (x$rows[1] > 1) {
-      gt[4] <- gt[4] + gt[6] * (x$rows[1] - 1)
-    }
-    extent <- .gt_dim_to_extent(gt, dim(d)[2:1])
-  }
-  ximage(t(d), extent = extent, ...)
+  if (!any(ok)) return(invisible(0L))
+  px <- t(cbind(fx[ok, , drop = FALSE], NA))
+  py <- t(cbind(fy[ok, , drop = FALSE], NA))
+  graphics::polygon(as.vector(px), as.vector(py), col = fill[ok], border = border[ok])
+  invisible(sum(ok))
 }

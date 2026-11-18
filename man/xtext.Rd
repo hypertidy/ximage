@@ -4,7 +4,17 @@
 \alias{xtext}
 \title{Label the cells of a matrix in place}
 \usage{
-xtext(x, extent = NULL, add = FALSE, cex = NULL, fit = 0.9, ...)
+xtext(
+  x,
+  extent = NULL,
+  add = FALSE,
+  cex = NULL,
+  fit = 0.9,
+  ...,
+  slice = NULL,
+  xy = NULL,
+  coords = NULL
+)
 }
 \arguments{
 \item{x}{a matrix of values to draw as labels, or a reader-output list}
@@ -20,6 +30,17 @@ xtext(x, extent = NULL, add = FALSE, cex = NULL, fit = 0.9, ...)
 'cex' is computed, default 0.9}
 
 \item{...}{arguments passed to \code{\link[=text]{text()}}, for example 'col'}
+
+\item{slice}{index of the slice to draw for arrays with more than two
+dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, or an
+unnamed value for the first non-spatial dimension. Default is the first
+slice}
+
+\item{xy}{the two spatial dimensions, x then y, as names or positions}
+
+\item{coords}{optional coordinates of the spatial dimensions,
+\code{list(x = , y = )} of centres, edges, or curvilinear matrices (see
+Details)}
 }
 \value{
 invisibly, a list with 'x', 'y' (label positions), 'labels', and
@@ -35,9 +56,11 @@ left to right down the page ("raster order").
 Text size is chosen automatically to fit the largest label within a cell,
 scaled by 'fit' (use 'cex' to override). Labels that are NA are not drawn.
 
-Input may be a matrix (values are used as labels via \code{\link[=format]{format()}}), or a
+Input may be a matrix (values are used as labels via \code{\link[=format]{format()}}), a
 list in the style of vapour or gdalraster reader output (a row-major
-vector with 'dimension'/'extent' attributes, or a 'gis' attribute).
+vector with 'dimension'/'extent' attributes, or a 'gis' attribute), or an
+array (one slice is labelled, see \code{\link[=as_ximage]{as_ximage()}}). With irregular or
+curvilinear \code{coords} each label sits at the centre of its cell's corners.
 }
 \examples{
 m <- matrix(1:12, 3, byrow = TRUE)

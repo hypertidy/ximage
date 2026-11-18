@@ -23,6 +23,10 @@ Draw rectangles from four colummns xmin,xmax,ymin,ymax
 }
 \details{
 Calls \code{\link[=rect]{rect()}}, but will instantiate a plot if \code{add = FALSE}.
+
+A way of generating input to this function is to use \code{extent_from_cell} in the
+vaster package, \code{vapour_read_extent} in the vapour package, or various tiling logic tools
+in spatial packages.
 }
 \examples{
 xrect(runif(100))

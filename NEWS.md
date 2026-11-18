@@ -1,5 +1,52 @@
 # ximage dev
 
+* Arrays with more than two dimensions are drawn one 2D slice at a time.
+ The spatial dimensions are found by name (`names(dim())` as
+ `zaro::zaro_read()` gives, `names(dimnames())` as `zaro::zaro_array()`
+ gives, or the `gis` attribute of `gdalraster::mdim_read()`), or set with
+ the new `xy` argument, and the new `slice` argument picks the slice
+ (default the first). A message reports the slice drawn and how to get the
+ others (silence with `options(ximage.verbose = FALSE)`). Selecting 3 or 4
+ indices along one dimension draws an RGB(A) composite, e.g.
+ `slice = list(band = c(4, 3, 2))`. Only the slice is read, so lazy arrays
+ fetch only its chunks. Previously these inputs errored, or were silently
+ drawn wrong: 3 or 4 time steps as false-colour RGB(A), 2 as grey/alpha,
+ transposed, or with 4D slices side by side.
+
+* Unnamed 3D arrays with more than 4 entries in the third dimension, and
+ GDAL reader output with more than 4 bands, now draw the first slice with a
+ message instead of an error (or silently the first band). Two bands from a
+ reader list are two slices, not grey/alpha. Unnamed 3D arrays with 2 to 4
+ entries are unchanged (grey/alpha, RGB, RGBA).
+
+* New `coords` argument in `ximage()`, `xcontour()` and `xtext()` places
+ data by coordinates: cell centres or edges as vectors, or curvilinear
+ centres or corners as matrices (`extent = list(x, y)` is the same).
+ Coordinates also come from `gdalraster::mdim_read()` metadata and ndr
+ coordinates and affine indexes. Data is oriented north up from them: rows
+ are reversed when y increases (most CF, NetCDF and Zarr data), columns
+ when x decreases. Irregular, curvilinear and rotated or sheared grids are
+ drawn cell by cell as quads, contours are traced in index space and
+ placed through the coordinates.
+
+* Scale and offset of `gdalraster::mdim_read()` output are applied, CF
+ time coordinates are decoded for the standard calendars to label slices,
+ and values of magnitude 1e30 or more are reported as a likely fill value.
+
+* New `as_ximage()` is the shared input decoder behind `ximage()`,
+ `xcontour()` and `xtext()` (#23); it returns the matrix to
+ draw in raster order with its extent (or cell corners), slice and labels.
+ It is an S3 generic so other packages can add methods. ndr `DataArray`
+ and `Variable` objects are drawn through `ndr::isel()`, so lazy data stays
+ lazy. Every verb now accepts every input form: `xcontour()` and `xtext()`
+ gain support for gdalraster `gis` lists and arrays.
+
+* `ximage()` now also returns 'zlim' (the data range colours were mapped
+ to, for drawing other slices with the same colours), and 'dims', 'slice'
+ and 'labels' for arrays.
+
+* ximage now depends on R >= 3.5.0.
+
 * Removed unused internal colour helpers left behind by the move to palr.
 
 * Removed internal definition `to_hex()` in favour of imported `palr::image_hex()`. 

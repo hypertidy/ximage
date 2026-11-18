@@ -26,6 +26,7 @@ reference:
     placed by extent, in raster order.
   contents:
   - ximage
+  - as_ximage
 
 - title: Adornments
   desc: >
