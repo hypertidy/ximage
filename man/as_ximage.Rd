@@ -25,9 +25,9 @@ placement from the input or from \code{coords}}
 \item{...}{arguments for methods}
 
 \item{slice}{index of the slice to draw for arrays with more than two
-dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, or an
-unnamed value for the first non-spatial dimension. Default is the first
-slice}
+dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, an
+unnamed value for the first non-spatial dimension, or one row of
+\code{\link[=xslices]{xslices()}} output. Default is the first slice}
 
 \item{xy}{the two spatial dimensions, x then y, as names or positions}
 
@@ -62,8 +62,8 @@ where known}
 }
 }
 \description{
-\code{as_ximage()} is the shared input decoder behind \code{\link[=ximage]{ximage()}}, \code{\link[=xcontour]{xcontour()}}
-and \code{\link[=xtext]{xtext()}}. It turns any supported input into a matrix (or
+\code{as_ximage()} is the shared input decoder behind \code{\link[=ximage]{ximage()}}, \code{\link[=xcontour]{xcontour()}},
+\code{\link[=xtext]{xtext()}} and \code{\link[=xpanels]{xpanels()}}. It turns any supported input into a matrix (or
 a colour array) in raster order, with its placement, and for arrays with
 more than two dimensions it chooses the slice to draw.
 }
@@ -133,4 +133,5 @@ a <- array(rep(volcano[87:1, ], 3) * rep(1:3, each = length(volcano)),
 d <- as_ximage(a, coords = list(x = 100 + 1:61, y = -60 + 1:87))
 d$extent
 ximage(a, slice = list(time = 2), coords = list(x = 100 + 1:61, y = -60 + 1:87))
+xslices(a)
 }

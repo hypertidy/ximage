@@ -34,7 +34,7 @@
  and values of magnitude 1e30 or more are reported as a likely fill value.
 
 * New `as_ximage()` is the shared input decoder behind `ximage()`,
- `xcontour()` and `xtext()` (#23); it returns the matrix to
+ `xcontour()`, `xtext()` and `xpanels()` (#23); it returns the matrix to
  draw in raster order with its extent (or cell corners), slice and labels.
  It is an S3 generic so other packages can add methods. ndr `DataArray`
  and `Variable` objects are drawn through `ndr::isel()`, so lazy data stays
@@ -44,6 +44,10 @@
 * `ximage()` now also returns 'zlim' (the data range colours were mapped
  to, for drawing other slices with the same colours), and 'dims', 'slice'
  and 'labels' for arrays.
+
+* New `xslices()` lists the slices of an array (index and coordinate label
+ per non-spatial dimension, metadata only), its rows work as `slice`. New
+ `xpanels()` draws several slices with one colour scale.
 
 * ximage now depends on R >= 3.5.0.
 

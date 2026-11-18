@@ -28,6 +28,12 @@ reference:
   - ximage
   - as_ximage
 
+- title: Arrays
+  desc: >
+    Work through the slices of arrays with more than two dimensions.
+  contents:
+  - xslices
+
 - title: Adornments
   desc: >
     Companions that share the layout conventions of ximage(), contours and

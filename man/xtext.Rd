@@ -32,9 +32,9 @@ xtext(
 \item{...}{arguments passed to \code{\link[=text]{text()}}, for example 'col'}
 
 \item{slice}{index of the slice to draw for arrays with more than two
-dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, or an
-unnamed value for the first non-spatial dimension. Default is the first
-slice}
+dimensions: a named list or vector, e.g. \code{list(time = 3, depth = 1)}, an
+unnamed value for the first non-spatial dimension, or one row of
+\code{\link[=xslices]{xslices()}} output. Default is the first slice}
 
 \item{xy}{the two spatial dimensions, x then y, as names or positions}
 

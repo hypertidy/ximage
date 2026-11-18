@@ -29,7 +29,8 @@
 #' with `slice`, and a message says which slice was drawn and how to get the
 #' others. Coordinates from the input's metadata or from `coords` orient and
 #' place the image, irregular or curvilinear coordinates are drawn cell by
-#' cell. See [as_ximage()] for the details.
+#' cell. See [as_ximage()] for the details, and [xslices()] and [xpanels()]
+#' for working through slices.
 #'
 #' Bare atomic vectors (no dim, no 'gis' attribute from gdalraster, no
 #' width/height/depth attributes) are accepted and a dimension is guessed

@@ -9,7 +9,9 @@ S3method(xtext,default)
 export(as_ximage)
 export(xcontour)
 export(ximage)
+export(xpanels)
 export(xrect)
+export(xslices)
 export(xtext)
 importFrom(grDevices,
   col2rgb,
