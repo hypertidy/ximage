@@ -1,5 +1,7 @@
 # ximage dev
 
+* Removed unused internal colour helpers left behind by the move to palr.
+
 * Removed internal definition `to_hex()` in favour of imported `palr::image_hex()`. 
 
 * ximage now imports palr. 
