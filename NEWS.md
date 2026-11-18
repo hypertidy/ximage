@@ -57,6 +57,8 @@
  grid of the plot via `cdtr::cdt_locate()`. Faces with a non-finite vertex
  are dropped, so projected meshes can mark failures with `NA`.
 
+* New vignette "Arrays, coordinates and meshes".
+
 * ximage now depends on R >= 3.5.0.
 
 * Removed unused internal colour helpers left behind by the move to palr.

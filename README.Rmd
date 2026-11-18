@@ -31,7 +31,9 @@ ximage supports making images from
 - numeric array (including RGB/A, and grey/alpha)
 - nativeRaster
 - data returned from `vapour::gdal_raster_()` or `gdalraster::read_ds()` functions which include numeric, character, byte vectors or nativeRaster types
-- flat vector data - a hueristic is applied to make a guess, with alternatives to consider - helpful for recovering from missing metadata
+- flat vector data - a heuristic is applied to make a guess, with alternatives to consider - helpful for recovering from missing metadata
+- arrays with more dimensions, from zaro, `gdalraster::mdim_read()` or ndr, drawn a slice at a time with a reminder of how to get the others (`slice`, `xslices()`, `xpanels()`)
+- coordinates as well as extents, including irregular and curvilinear grids (`coords`)
 
 Missing values display as a colour of your choosing (`na.col`, transparent
 by default), a constant `alpha` can be applied over any input for overlay
@@ -39,7 +41,9 @@ work, and `zlim` anchors absolute colours across multiple plots.
 
 Alongside `ximage()` there are matching adornment functions that share its
 layout conventions: `xcontour()` (contours at cell centres), `xtext()`
-(cell values as labels), and `xrect()` (rectangles from extents).
+(cell values as labels), and `xrect()` (rectangles from extents). `xmesh()`
+draws triangle and quad meshes (cdtr, laridae, quadmesh and other mesh3d)
+with the same colour mapping. See the [arrays, coordinates and meshes](https://hypertidy.github.io/ximage/articles/arrays-and-meshes.html) vignette.
 
 The orientation is in "raster order", i.e. when you're looking at the
 picture it's top left to top right, then scan lines down each row to the
